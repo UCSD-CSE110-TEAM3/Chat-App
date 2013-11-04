@@ -38,19 +38,33 @@ public class ChatClient implements MessageListener{
 	} 
 
 	/* Send a TextMessage to the server of type login with the user's name */
-	private void logon() {
+	public void logon() {
 		TextMessage logon;
 		try {
 			logon = session.createTextMessage(this.user);
 			logon.setJMSType("login");
 			logon.setJMSReplyTo(oriQueue);
-			logon.setStringProperty("name", this.user);
 			producer.send(logon);
 			System.out.println( "logged on" );
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	/* Sends a TextMessage to the server of type logout with the user's name */
+	public void logout() {
+		TextMessage logout;
+		try {
+			logout = session.createTextMessage(this.user);
+			logout.setJMSType("logout");
+			logout.setJMSReplyTo(oriQueue);
+			producer.send(logout);
+			System.out.println( "logging out" );
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 	}
 	
 	public void send(String msg) throws JMSException {

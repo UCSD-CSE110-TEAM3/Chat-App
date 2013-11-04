@@ -78,6 +78,7 @@ public class ChatClientApplication {
 			//ChatClient client = wireClient( "Mimi" );
 			ChatClient client2 = wireClient( "Ben" );
 	        System.out.println("ChatClient wired.");
+	        client2.logout();
 			/* 
 			 * Now we can happily send messages around
 			 */

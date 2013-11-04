@@ -30,7 +30,6 @@ public class Server{
 	
 	public void receive(Message msg) throws JMSException {
 		if ( msg.getJMSType() != null && msg.getJMSType().equals("login") ) {
-			System.out.println( "Logging in" );
 			String user = ((TextMessage)msg).getText();
 			Destination dest = msg.getJMSReplyTo();
 			this.login( user, dest );
@@ -38,7 +37,14 @@ public class Server{
 			this.broadcastAll( user + " has logged on" );
 			return;
 		}
-		
+		else if ( msg.getJMSType() != null && msg.getJMSType().equals("logout") ) {
+			String user = ((TextMessage)msg).getText();
+			this.logout( user );
+			Destination dest = msg.getJMSReplyTo();
+			template.convertAndSend( dest, "Logged out of server ");
+			this.broadcastAll( user + " has logged out" );
+			return;
+		}
 		try {
 			System.out.println(((TextMessage)msg).getText());
 		} catch (JMSException e) {
@@ -51,6 +57,10 @@ public class Server{
 	
 	private void login( String user, Destination dest ) {
 		online.put(user, dest);
+	}
+	
+	private void logout( String user ) {
+		online.remove(user);
 	}
 	
 	private void processMessage( Message msg ) {
