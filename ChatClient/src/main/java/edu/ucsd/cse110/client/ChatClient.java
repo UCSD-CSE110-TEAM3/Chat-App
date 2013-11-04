@@ -7,6 +7,7 @@ package edu.ucsd.cse110.client;
 
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
+import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.MessageConsumer;
 import javax.jms.TextMessage;
@@ -18,14 +19,16 @@ public class ChatClient implements MessageListener{
 	private MessageConsumer consumer; // receives messages
 	private Session session;
 	private String user;
+	private Queue oriQueue;
 	
-	public ChatClient(MessageProducer producer, MessageConsumer consumer, Session session, String user) {
+	public ChatClient(MessageProducer producer, Session session, String user) {
 		super();
 		this.user = user;
 		this.producer = producer;
-		this.session = session;
-		this.consumer = consumer;
+		this.session = session;		
 		try {
+			this.oriQueue = session.createTemporaryQueue();
+			this.consumer = session.createConsumer(oriQueue);
 			consumer.setMessageListener( this );
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
@@ -48,9 +51,9 @@ public class ChatClient implements MessageListener{
 		
 		TextMessage toSend = session.createTextMessage( message );
 		toSend.setObjectProperty( "receipients", receipients );
-		toSend.setStringProperty( "from", "user" );
+		toSend.setJMSReplyTo( oriQueue );
 		
-		producer.send( session.createTextMessage( message ) );
+		producer.send( toSend );
 	}
 	
 	public void onMessage( Message msg ) {

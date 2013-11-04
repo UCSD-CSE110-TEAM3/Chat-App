@@ -60,11 +60,12 @@ public class ChatClientApplication {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Queue destQueue = session.createQueue(Constants.DESTQUEUE);
         MessageProducer producer = session.createProducer(destQueue);
-        Queue oriQueue = session.createQueue("Mimi");
-        MessageConsumer consumer = session.createConsumer(destQueue);
+        /*
+        Queue oriQueue = oriQueue = session.createTemporaryQueue();
+        MessageConsumer consumer = session.createConsumer(oriQueue);*/
         
         // make them log in to get their name to put in the constructor
-        return new ChatClient(producer, consumer, session, "Mimi");
+        return new ChatClient(producer, session, "Mimi");
 	}
 	
 	public static void main(String[] args) {

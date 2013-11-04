@@ -44,7 +44,7 @@ public class Server{
 					return session.createTextMessage("Ping!");
 				}
 	        }; 
-			template.send( Constants.ORIQUEUE, messageCreator );
+			template.send( msg.getJMSReplyTo(), messageCreator );
 			
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
