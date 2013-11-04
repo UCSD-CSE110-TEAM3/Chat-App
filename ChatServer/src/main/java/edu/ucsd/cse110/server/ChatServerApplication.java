@@ -10,6 +10,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 import javax.jms.Session;
+import javax.jms.MessageListener;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
@@ -35,14 +36,15 @@ public class ChatServerApplication {
     }
     
     @Bean
-    MessageListenerAdapter receiver() {
-        return new MessageListenerAdapter(new Server()) {{
-            setDefaultListenerMethod("receive");
+    MessageListenerAdapter receiver( JmsTemplate jmsTemplate ) {
+        return new MessageListenerAdapter(new Server( jmsTemplate )) {{
+        	setDefaultListenerMethod( "receive");
+        	setMessageConverter(null);
         }};
     }
     
     @Bean
-    SimpleMessageListenerContainer container(final MessageListenerAdapter messageListener,
+    SimpleMessageListenerContainer container(final MessageListener messageListener,
             final ConnectionFactory connectionFactory) {
         return new SimpleMessageListenerContainer() {{
             setMessageListener(messageListener);
@@ -62,6 +64,7 @@ public class ChatServerApplication {
 		broker.addConnector(Constants.ACTIVEMQ_URL);
 		broker.setPersistent(false);
 		broker.start();
+		System.out.println("Sending a new message:");
 		AnnotationConfigApplicationContext context = 
 		          new AnnotationConfigApplicationContext(ChatServerApplication.class);
 		
@@ -72,14 +75,13 @@ public class ChatServerApplication {
         }; 
         
         JmsTemplate jmsTemplate = context.getBean(JmsTemplate.class);
-        System.out.println("Sending a new message:");
-        jmsTemplate.send(Constants.QUEUENAME, messageCreator);
+        
+        //jmsTemplate.send(Constants.QUEUENAME, messageCreator);
         /*
-        MessageListenerAdapter mla = context.getBean(MessageListenerAdapter.class);
+        MessageListenerAdapter mla = context.getBean(MessageListenerAdapter.class);*/
         
         //Message sent = jmsTemplate.receive( Constants.QUEUENAME );
         //new Server().receive( ((TextMessage)sent).getText() );
-        */
         //context.close();
 	}
 

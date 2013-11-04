@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
+import javax.jms.MessageConsumer;
 import javax.jms.Queue;
 import javax.jms.Session;
 
@@ -57,10 +58,13 @@ public class ChatClientApplication {
         connection.start();
         CloseHook.registerCloseHook(connection);
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Queue destQueue = session.createQueue(Constants.QUEUENAME);
+        Queue destQueue = session.createQueue(Constants.DESTQUEUE);
         MessageProducer producer = session.createProducer(destQueue);
+        Queue oriQueue = session.createQueue("Mimi");
+        MessageConsumer consumer = session.createConsumer(destQueue);
         
-        return new ChatClient(producer,session, "Mimi");
+        // make them log in to get their name to put in the constructor
+        return new ChatClient(producer, consumer, session, "Mimi");
 	}
 	
 	public static void main(String[] args) {
@@ -75,7 +79,8 @@ public class ChatClientApplication {
 			/* 
 			 * Now we can happily send messages around
 			 */
-			client.send("To:Mimi;Queue:Constants.QUEUENAME;Msg:Hi My Name is Mimi");
+	        String[] r  = {"Mimi"};
+			client.sendMessageTo( "Mimi", "Hi Mimi" );
 			System.out.println("Message Sent!");
 	        //System.exit(0);
 		} catch (JMSException e) {

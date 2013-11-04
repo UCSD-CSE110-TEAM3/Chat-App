@@ -5,10 +5,55 @@
  */
 package edu.ucsd.cse110.server;
 
-public class Server {
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 
-	public void receive(String msg) {
-		System.out.println(msg);
-		String dest = 
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
+
+public class Server{
+	JmsTemplate template;
+	
+	public Server( JmsTemplate jmsTemplate ) {
+		ActiveMQConnectionFactory factory= new ActiveMQConnectionFactory(Constants.ACTIVEMQ_URL);
+		template = new JmsTemplate( factory) ;
+		
+	}
+	
+	public void receive(Message msg) {
+		try {
+			System.out.println( "Hi");
+			System.out.println(((TextMessage)msg).getText());
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		processMessage( msg );
+		
+	}
+	
+	private void processMessage( Message msg ) {
+		try {
+			String person = (String) msg.getObjectProperty( "receipients" );
+			MessageCreator messageCreator = new MessageCreator() {
+				public Message createMessage(Session session) throws JMSException {
+					return session.createTextMessage("Ping!");
+				}
+	        }; 
+			template.send( Constants.ORIQUEUE, messageCreator );
+			
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private void sendMessage() {
+		
 	}
 }
