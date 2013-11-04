@@ -5,10 +5,13 @@
  */
 package edu.ucsd.cse110.server;
 
+import java.util.HashMap;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import javax.jms.Destination;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -17,14 +20,25 @@ import org.springframework.jms.core.MessageCreator;
 
 public class Server{
 	JmsTemplate template;
+	HashMap<String, Destination> online;
 	
 	public Server() {
 		ActiveMQConnectionFactory factory= new ActiveMQConnectionFactory(Constants.ACTIVEMQ_URL);
-		template = new JmsTemplate(factory) ;
-		
+		template = new JmsTemplate(factory);
+		online = new HashMap<String, Destination>();
 	}
 	
-	public void receive(Message msg) {
+	public void receive(Message msg) throws JMSException {
+		if ( msg.getJMSType() != null && msg.getJMSType().equals("login") ) {
+			System.out.println( "Logging in" );
+			String user = ((TextMessage)msg).getText();
+			Destination dest = msg.getJMSReplyTo();
+			this.login( user, dest );
+			template.convertAndSend( dest, "Logged onto server ");
+			this.broadcastAll( user + " has logged on" );
+			return;
+		}
+		
 		try {
 			System.out.println(((TextMessage)msg).getText());
 		} catch (JMSException e) {
@@ -35,24 +49,24 @@ public class Server{
 		
 	}
 	
+	private void login( String user, Destination dest ) {
+		online.put(user, dest);
+	}
+	
 	private void processMessage( Message msg ) {
 		try {
-			//String person = (String) msg.getObjectProperty( "receipients" );
-			/*MessageCreator messageCreator = new MessageCreator() {
-				public Message createMessage(Session session) throws JMSException {
-					return session.createTextMessage("Ping!");
-				}
-	        }; */
 			template.convertAndSend( msg.getJMSReplyTo(), ((TextMessage)msg).getText() );
 			
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	
-	private void sendMessage() {
-		
+	public void broadcastAll( String message ) {
+		for (String user:online.keySet()) {
+			Destination dest = online.get(user);
+			template.convertAndSend(dest, message);
+		}
 	}
 }

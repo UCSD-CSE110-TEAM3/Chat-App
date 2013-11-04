@@ -51,7 +51,7 @@ public class ChatClientApplication {
 	 * Notice that ChatClient does not depend on ActiveMQ (the concrete 
 	 * communication platform we use) but just in the standard JMS interface.
 	 */
-	private static ChatClient wireClient() throws JMSException, URISyntaxException {
+	private static ChatClient wireClient( String name ) throws JMSException, URISyntaxException {
 		ActiveMQConnection connection = 
 				ActiveMQConnection.makeConnection(
 				/*Constants.USERNAME, Constants.PASSWORD,*/ Constants.ACTIVEMQ_URL);
@@ -65,7 +65,7 @@ public class ChatClientApplication {
         MessageConsumer consumer = session.createConsumer(oriQueue);*/
         
         // make them log in to get their name to put in the constructor
-        return new ChatClient(producer, session, "Mimi");
+        return new ChatClient(producer, session, name);
 	}
 	
 	public static void main(String[] args) {
@@ -75,14 +75,14 @@ public class ChatClientApplication {
 			 * We have some other function wire the ChatClient 
 			 * to the communication platform
 			 */
-			ChatClient client = wireClient();
+			//ChatClient client = wireClient( "Mimi" );
+			ChatClient client2 = wireClient( "Ben" );
 	        System.out.println("ChatClient wired.");
 			/* 
 			 * Now we can happily send messages around
 			 */
-	        String[] r  = {"Mimi"};
-			client.sendMessageTo( "Mimi", "Hi Mimi" );
-			System.out.println("Message Sent!");
+			//client.sendMessageTo( "", "Hi" );
+			//System.out.println("Message Sent!");
 	        //System.exit(0);
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
