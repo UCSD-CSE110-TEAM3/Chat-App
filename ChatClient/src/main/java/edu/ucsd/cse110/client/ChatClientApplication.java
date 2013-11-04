@@ -1,11 +1,7 @@
-/**
- * Name1: Nhu-Quynh Liu
- * PID1: A10937319
- * Email1: n1liu@ucsd.edu
- */
 package edu.ucsd.cse110.client;
 
 import java.net.URISyntaxException;
+import java.util.Scanner;
 
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
@@ -16,7 +12,7 @@ import javax.jms.Session;
 import org.apache.activemq.ActiveMQConnection;
 
 public class ChatClientApplication {
-
+	private static Scanner scanner = new Scanner( System.in );
 	/*
 	 * This inner class is used to make sure we clean up when the client closes
 	 */
@@ -76,14 +72,15 @@ public class ChatClientApplication {
 			 * to the communication platform
 			 */
 			//ChatClient client = wireClient( "Mimi" );
-			ChatClient client2 = wireClient( "Ben" );
-	        System.out.println("ChatClient wired.");
-	        client2.logout();
+			
+	        System.out.println("Enter your username.");
+	        String user = scanner.next();
+	        ChatClient client = wireClient( user );
+	        //client.logout();
 			/* 
 			 * Now we can happily send messages around
 			 */
 			//client.sendMessageTo( "", "Hi" );
-			//System.out.println("Message Sent!");
 	        //System.exit(0);
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block

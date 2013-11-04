@@ -1,8 +1,3 @@
-/**
- * Name1: Nhu-Quynh Liu
- * PID1: A10937319
- * Email1: n1liu@ucsd.edu
- */
 package edu.ucsd.cse110.server;
 
 import java.util.HashMap;
