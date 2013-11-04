@@ -57,7 +57,6 @@ public class ChatClient implements MessageListener{
 	}
 	
 	public void onMessage( Message msg ) {
-		System.out.println( "Hi" );
 		//deal with message from server
 		try {
 			System.out.println(((TextMessage)msg).getText() + "Received");

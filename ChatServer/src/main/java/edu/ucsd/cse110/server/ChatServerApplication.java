@@ -36,8 +36,8 @@ public class ChatServerApplication {
     }
     
     @Bean
-    MessageListenerAdapter receiver( JmsTemplate jmsTemplate ) {
-        return new MessageListenerAdapter(new Server( jmsTemplate )) {{
+    MessageListenerAdapter receiver() {
+        return new MessageListenerAdapter(new Server()) {{
         	setDefaultListenerMethod( "receive");
         	setMessageConverter(null);
         }};
@@ -74,7 +74,7 @@ public class ChatServerApplication {
 			}
         }; 
         
-        JmsTemplate jmsTemplate = context.getBean(JmsTemplate.class);
+        //JmsTemplate jmsTemplate = context.getBean(JmsTemplate.class);
         
         //jmsTemplate.send(Constants.QUEUENAME, messageCreator);
         /*
