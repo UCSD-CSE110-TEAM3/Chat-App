@@ -71,7 +71,6 @@ public class ChatClientApplication {
 			 * We have some other function wire the ChatClient 
 			 * to the communication platform
 			 */
-			//ChatClient client = wireClient( "Mimi" );
 			
 	        System.out.println("Enter your username.");
 	        String user = scanner.next();

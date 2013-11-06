@@ -59,7 +59,6 @@ public class ChatServerApplication {
 		broker.addConnector(Constants.ACTIVEMQ_URL);
 		broker.setPersistent(false);
 		broker.start();
-		System.out.println("Sending a new message:");
 		AnnotationConfigApplicationContext context = 
 		          new AnnotationConfigApplicationContext(ChatServerApplication.class);
 		
