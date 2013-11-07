@@ -61,7 +61,7 @@ public class ChatClientApplication {
         MessageConsumer consumer = session.createConsumer(oriQueue);*/
         
         // make them log in to get their name to put in the constructor
-        return new ChatClient(producer, session, name);
+        return new ChatClient(producer, session, name, name);
 	}
 	
 	public static void main(String[] args) {

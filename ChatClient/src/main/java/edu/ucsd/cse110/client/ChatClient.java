@@ -13,12 +13,12 @@ public class ChatClient implements MessageListener{
 	private MessageProducer producer; // makes messages
 	private MessageConsumer consumer; // receives messages
 	private Session session;
-	private String user;
+	private User user;
 	private Queue oriQueue;
 	
-	public ChatClient(MessageProducer producer, Session session, String user) {
+	public ChatClient(MessageProducer producer, Session session, String username, String password) {
 		super();
-		this.user = user;
+		this.user = new User(username, password);
 		this.producer = producer;
 		this.session = session;		
 		try {
@@ -36,7 +36,7 @@ public class ChatClient implements MessageListener{
 	public void logon() {
 		TextMessage logon;
 		try {
-			logon = session.createTextMessage(this.user);
+			logon = session.createTextMessage(this.user.toString());
 			logon.setJMSType("login");
 			logon.setJMSReplyTo(oriQueue);
 			producer.send(logon);
@@ -51,7 +51,7 @@ public class ChatClient implements MessageListener{
 	public void logout() {
 		TextMessage logout;
 		try {
-			logout = session.createTextMessage(this.user);
+			logout = session.createTextMessage(this.user.toString());
 			logout.setJMSType("logout");
 			logout.setJMSReplyTo(oriQueue);
 			producer.send(logout);
