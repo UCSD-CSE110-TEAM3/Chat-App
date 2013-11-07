@@ -24,6 +24,7 @@ public class Server{
 	}
 	
 	public void receive(Message msg) throws JMSException {
+		// if login
 		if ( msg.getJMSType() != null && msg.getJMSType().equals("login") ) {
 			String user = ((TextMessage)msg).getText();
 			Destination dest = msg.getJMSReplyTo();
@@ -32,6 +33,23 @@ public class Server{
 			this.broadcastAll( user + " has logged on" );
 			return;
 		}
+		// if broadcast msg
+		else if ( msg.getJMSType() != null && msg.getJMSType().equals("all") ) {
+			String allMsg = ((TextMessage)msg).getText();
+			String username = msg.getStringProperty("username");
+			this.broadcastAll( username + ": "+ allMsg);
+			return;
+		}
+		// if whisper
+		else if ( msg.getJMSType() != null && msg.getJMSType().equals("wMsg") ) {
+			String wMsg = ((TextMessage)msg).getText();
+			String username = msg.getStringProperty("username");
+			String toUser = msg.getStringProperty("toUser");
+			Destination fromUser = msg.getJMSReplyTo();
+			this.sendOne(">whisper from " + username + ": " +wMsg, toUser, fromUser);
+			return;
+		}
+		// if logout
 		else if ( msg.getJMSType() != null && msg.getJMSType().equals("logout") ) {
 			String user = ((TextMessage)msg).getText();
 			this.logout( user );
@@ -73,5 +91,20 @@ public class Server{
 			Destination dest = online.get(user);
 			template.convertAndSend(dest, message);
 		}
+		return;
+	}
+	
+	public void sendOne( String message, String toUser, Destination fromUser ) {
+		if (!online.containsKey(toUser)) {
+			template.convertAndSend( fromUser, "User not found :(");
+		}
+		for (String user:online.keySet()) {
+			if ( toUser.equals(user) ) {
+				Destination dest = online.get(user);
+				template.convertAndSend(dest, message);
+				return;
+			}
+		}
+		return;
 	}
 }

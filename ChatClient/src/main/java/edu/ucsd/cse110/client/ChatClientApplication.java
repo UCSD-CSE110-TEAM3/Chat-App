@@ -49,16 +49,19 @@ public class ChatClientApplication {
 	 */
 	private static ChatClient wireClient( String name ) throws JMSException, URISyntaxException {
 		ActiveMQConnection connection = 
+				// make a connection to the server (localhost)
 				ActiveMQConnection.makeConnection(
 				/*Constants.USERNAME, Constants.PASSWORD,*/ Constants.ACTIVEMQ_URL);
         connection.start();
-        CloseHook.registerCloseHook(connection);
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        CloseHook.registerCloseHook(connection);//ignore
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE); 
+        // make a queue that server will listen to
         Queue destQueue = session.createQueue(Constants.DESTQUEUE);
+        // producer sends messages to server
         MessageProducer producer = session.createProducer(destQueue);
         /*
         Queue oriQueue = oriQueue = session.createTemporaryQueue();
-        MessageConsumer consumer = session.createConsumer(oriQueue);*/
+        MessageConsumer consumer = session.createConsuler(oriQueue);*/
         
         // make them log in to get their name to put in the constructor
         return new ChatClient(producer, session, name, name);
@@ -68,18 +71,23 @@ public class ChatClientApplication {
 		try {
 			
 			/* 
-			 * We have some other function wire the ChatClient 
+			 * We have some other function wire tyuphe ChatClient 
 			 * to the communication platform
 			 */
-			
 	        System.out.println("Enter your username.");
+	        System.out.print("Username: ");
 	        String user = scanner.next();
 	        ChatClient client = wireClient( user );
-	        //client.logout();
-			/* 
-			 * Now we can happily send messages around
-			 */
+	        System.out.println(" ");
+			// Now we can happily send messages around
+	        client.startBroadChat();
+	        
+	        //logout client afterwards
+	        client.logout();
+	        
+	        
 			//client.sendMessageTo( "", "Hi" );
+	        //client.logout();
 	        //System.exit(0);
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block

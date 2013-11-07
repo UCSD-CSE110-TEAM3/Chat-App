@@ -1,5 +1,7 @@
 package edu.ucsd.cse110.client;
 
+import java.util.Scanner;
+
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
@@ -23,7 +25,9 @@ public class ChatClient implements MessageListener{
 		this.session = session;		
 		try {
 			this.oriQueue = session.createTemporaryQueue();
+			// oriQueue = address of this client 
 			this.consumer = session.createConsumer(oriQueue);
+			// consumer takes msgs from Queue
 			consumer.setMessageListener( this );
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
@@ -45,6 +49,77 @@ public class ChatClient implements MessageListener{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return;
+	}
+	
+	//start public chat!
+	public void startBroadChat() {
+		String userMsg = "";
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Send a broadcast message!");
+		while(!userMsg.equals("/logout")) {
+			userMsg = scanner.nextLine();
+			if (userMsg.length() > 2 &&
+				userMsg.substring(0, 3).equals("/w ")) {
+					userMsg = userMsg.substring(3);
+					this.whisper(userMsg);
+			}
+			else if (userMsg.length() >= 5 &&
+					 userMsg.substring(0, 5).equals("/help")) {
+				this.help();
+			}
+			else {
+				this.allMsg(userMsg);
+			}
+		}
+		//close the scanner
+		scanner.close();
+		//end chat broadcasting
+		return;
+	}
+	
+	//send a TextMessage to server of type "all" and user's name
+	public void allMsg(String userMsg) {
+		TextMessage allMsg;
+		try {
+			allMsg = session.createTextMessage(userMsg);
+			allMsg.setJMSType("all");
+			allMsg.setStringProperty("username", this.user.toString());
+			producer.send(allMsg);
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+		return;
+	}
+	
+	// Sends TextMessage to server to send to one particular client
+	public void whisper(String userMsg){
+		if (userMsg.indexOf(" ") == -1) {
+			System.out.println("Improper use of '/w'");
+			System.out.println("Please use '/help' for a list of commands");
+			return;
+		}
+		String toUser = userMsg.substring(0, userMsg.indexOf(" "));
+		userMsg = userMsg.substring(userMsg.indexOf(" ") + 1);
+		TextMessage wMsg;
+		try {
+			wMsg = session.createTextMessage(userMsg);
+			wMsg.setJMSType("wMsg");
+			wMsg.setStringProperty("username", this.user.toString());
+			wMsg.setStringProperty("toUser", toUser);
+			wMsg.setJMSReplyTo(oriQueue);
+			producer.send(wMsg);
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+		return;
+	}
+	
+	// prints our all commands
+	public void help() {
+		System.out.println("Here is a list of commands:");
+		System.out.println("To logout: '/logout'");
+		System.out.println("To whisper: '/w username message'");
 	}
 	
 	/* Sends a TextMessage to the server of type logout with the user's name */
@@ -64,6 +139,7 @@ public class ChatClient implements MessageListener{
 	
 	public void send(String msg) throws JMSException {
 		producer.send(session.createTextMessage(msg));
+		return;
 	}
 	
 	public boolean equals( ChatClient c ) {
@@ -91,5 +167,6 @@ public class ChatClient implements MessageListener{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return;
 	}
 }
