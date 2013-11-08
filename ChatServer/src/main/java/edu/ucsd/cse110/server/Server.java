@@ -31,6 +31,7 @@ public class Server{
 			this.login( user, dest );
 			template.convertAndSend( dest, "Logged onto server ");
 			this.broadcastAll( user + " has logged on" );
+			template.convertAndSend( dest, "Enter '/help' for chat commands.");
 			return;
 		}
 		// if broadcast msg
