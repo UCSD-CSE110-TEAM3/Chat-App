@@ -39,7 +39,6 @@ public class ChatClient implements MessageListener{
 			System.exit(1);
 		}
 		this.logon();
-		startBroadChat();
 	} 
 
 	/* Send a TextMessage to the server of type login with the user's name */
@@ -86,12 +85,17 @@ public class ChatClient implements MessageListener{
 					 userMsg.substring(0, 5).equals("/help")) {
 				this.help();
 			}
+			else if ( userMsg.equals("/logout") ){
+				scanner.close();
+				this.logout();
+				return;
+			}
 			else {
 				this.allMsg(userMsg);
 			}
 		}
 		//close the scanner
-		scanner.close();
+
 		//end chat broadcasting
 		return;
 	}
