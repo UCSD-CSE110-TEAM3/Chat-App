@@ -26,6 +26,7 @@ public class Server{
 	private HashMap<String, Destination> online;
 	private HashMap<String, String> accounts; //the accounts that is loaded to memory for now.
 	
+	
 	public Server( ) {
 		online = new HashMap<String, Destination>();
 		
@@ -122,7 +123,9 @@ public class Server{
 	
 	public void setSender( JmsTemplate jmsTemplate ) {
 		this.template = jmsTemplate;
+		
 	}
+	
 	
 	public void receive(Message msg) throws JMSException {
 		// if login
