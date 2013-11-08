@@ -22,7 +22,7 @@ import org.springframework.jms.core.MessageCreator;
 
 public class Server{
 	
-	JmsTemplate template;
+	private JmsTemplate template;
 	private HashMap<String, Destination> online;
 	private HashMap<String, String> accounts; //the accounts that is loaded to memory for now.
 	
@@ -130,7 +130,7 @@ public class Server{
 	public void receive(Message msg) throws JMSException {
 		// if login
 		if ( msg.getJMSType() != null && msg.getJMSType().equals("login") ) {
-			String user = ((TextMessage)msg).getText();
+			String user = msg.getStringProperty("username");
 			Destination dest = msg.getJMSReplyTo();
 			this.login( user, dest );
 			template.convertAndSend( dest, "Logged onto server ");
@@ -156,7 +156,7 @@ public class Server{
 		}
 		// if logout
 		else if ( msg.getJMSType() != null && msg.getJMSType().equals("logout") ) {
-			String user = ((TextMessage)msg).getText();
+			String user = msg.getStringProperty("username");
 			this.logout( user );
 			Destination dest = msg.getJMSReplyTo();
 			template.convertAndSend( dest, "Logged out of server ");
@@ -169,7 +169,7 @@ public class Server{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		processMessage( msg );
+		//processMessage( msg );
 		
 	}
 	

@@ -14,9 +14,11 @@ import javax.jms.MessageListener;
 public class ChatClient implements MessageListener{
 	private MessageProducer producer; // makes messages
 	private MessageConsumer consumer; // receives messages
+	private MessageFactory msgFactory;
+	
 	private Session session;
 	private User user;
-	private Queue oriQueue;
+	private Queue originQueue;
 	private String replyTo;
 	
 	public ChatClient(MessageProducer producer, Session session, String username, String password) {
@@ -26,14 +28,15 @@ public class ChatClient implements MessageListener{
 		this.session = session;		
 		this.replyTo = "";
 		try {
-			this.oriQueue = session.createTemporaryQueue();
+			this.originQueue = session.createTemporaryQueue();
+			this.msgFactory = new MessageFactory( this );
 			// oriQueue = address of this client 
-			this.consumer = session.createConsumer(oriQueue);
+			this.consumer = session.createConsumer(originQueue);
 			// consumer takes msgs from Queue
 			consumer.setMessageListener( this );
 		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println( "ERROR: Failed to construct ChatClient.");
+			System.exit(1);
 		}
 		this.logon();
 		startBroadChat();
@@ -41,16 +44,26 @@ public class ChatClient implements MessageListener{
 
 	/* Send a TextMessage to the server of type login with the user's name */
 	public void logon() {
-		TextMessage logon;
+		Message logonMsg;
 		try {
-			logon = session.createTextMessage(this.user.toString());
-			logon.setJMSType("login");
-			logon.setJMSReplyTo(oriQueue);
-			producer.send(logon);
+			logonMsg = msgFactory.createMessage("login");
+			producer.send(logonMsg);
 		} catch (JMSException e) {
 			System.out.println( "ERROR: Logging on unsuccessful. Check if Server is running.");
 		}
 		return;
+	}
+	
+	/* Sends a TextMessage to the server of type logout with the user's name */
+	public void logout() {
+		Message logoutMsg;
+		try {
+			logoutMsg = msgFactory.createMessage("logout");
+			producer.send(logoutMsg);
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 	}
 	
 	//start public chat!
@@ -85,14 +98,12 @@ public class ChatClient implements MessageListener{
 	
 	//send a TextMessage to server of type "all" and user's name
 	public void allMsg(String userMsg) {
-		TextMessage allMsg;
+		Message allMsg;
 		try {
-			allMsg = session.createTextMessage(userMsg);
-			allMsg.setJMSType("all");
-			allMsg.setStringProperty("username", this.user.toString());
+			allMsg = msgFactory.createMessage("all", userMsg);
 			producer.send(allMsg);
 		} catch (JMSException e) {
-			e.printStackTrace();
+			System.out.println( "ERROR: Failed to broadcast message.");
 		}
 		return;
 	}
@@ -107,31 +118,23 @@ public class ChatClient implements MessageListener{
 		if (userMsg.substring(0, 3).equals("/r ")) {
 			String toUser = this.replyTo;
 			userMsg = userMsg.substring(userMsg.indexOf(" ") + 1);
-			TextMessage wMsg;
+			Message wMsg;
 			try {
-				wMsg = session.createTextMessage(userMsg);
-				wMsg.setJMSType("wMsg");
-				wMsg.setStringProperty("username", this.user.toString());
-				wMsg.setStringProperty("toUser", toUser);
-				wMsg.setJMSReplyTo(oriQueue);
+				wMsg = msgFactory.createMessage("wMsg", userMsg, toUser);
 				producer.send(wMsg);
 			} catch (JMSException e) {
-				e.printStackTrace();
+				System.out.println( "Failed to whisper to another user.");
 			}
 			return;
 		}
 		String toUser = userMsg.substring(0, userMsg.indexOf(" "));
 		userMsg = userMsg.substring(userMsg.indexOf(" ") + 1);
-		TextMessage wMsg;
+		Message wMsg;
 		try {
-			wMsg = session.createTextMessage(userMsg);
-			wMsg.setJMSType("wMsg");
-			wMsg.setStringProperty("username", this.user.toString());
-			wMsg.setStringProperty("toUser", toUser);
-			wMsg.setJMSReplyTo(oriQueue);
+			wMsg = msgFactory.createMessage("wMsg", userMsg, toUser);
 			producer.send(wMsg);
 		} catch (JMSException e) {
-			e.printStackTrace();
+			System.out.println( "Failed to whisper to another user.");
 		}
 		return;
 	}
@@ -142,40 +145,6 @@ public class ChatClient implements MessageListener{
 		System.out.println("To logout: '/logout'");
 		System.out.println("To whisper: '/w username message'");
 		System.out.println("To reply to recent whisper: '/r message'");
-	}
-	
-	/* Sends a TextMessage to the server of type logout with the user's name */
-	public void logout() {
-		TextMessage logout;
-		try {
-			logout = session.createTextMessage(this.user.toString());
-			logout.setJMSType("logout");
-			logout.setJMSReplyTo(oriQueue);
-			producer.send(logout);
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
-	}
-	
-	public void send(String msg) throws JMSException {
-		producer.send(session.createTextMessage(msg));
-		return;
-	}
-	
-	public boolean equals( ChatClient c ) {
-		if ( c.user == this.user ) {
-			return true;
-		}
-		return false;
-	}
-	
-	public void sendMessageTo( String receipients, String message ) throws JMSException {
-		TextMessage toSend = session.createTextMessage( message );
-		toSend.setObjectProperty( "receipients", receipients );
-		toSend.setJMSReplyTo( oriQueue );
-		
-		producer.send( toSend );
 	}
 	
 	public void onMessage( Message msg ) {
@@ -193,5 +162,17 @@ public class ChatClient implements MessageListener{
 			e.printStackTrace();
 		}
 		return;
+	}
+	
+	public User getUser() {
+		return user;
+	}
+	
+	public Session getSession() {
+		return session;
+	}
+	
+	public Queue getQueue() {
+		return originQueue;
 	}
 }
