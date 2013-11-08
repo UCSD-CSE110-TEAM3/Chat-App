@@ -61,7 +61,7 @@ public class ChatClientApplication {
         MessageProducer producer = session.createProducer(destQueue);
         /*
         Queue oriQueue = oriQueue = session.createTemporaryQueue();
-        MessageConsumer consumer = session.createConsuler(oriQueue);*/
+        MessageConsumer consumer = session.createConsumer(oriQueue);*/
         
         // make them log in to get their name to put in the constructor
         return new ChatClient(producer, session, username, password);
@@ -71,7 +71,7 @@ public class ChatClientApplication {
 		try {
 			
 			/* 
-			 * We have some other function wire tyuphe ChatClient 
+			 * We have some other function wire type ChatClient 
 			 * to the communication platform
 			 */
 	        System.out.println("Enter your username.");

@@ -17,12 +17,14 @@ public class ChatClient implements MessageListener{
 	private Session session;
 	private User user;
 	private Queue oriQueue;
+	private String replyTo;
 	
 	public ChatClient(MessageProducer producer, Session session, String username, String password) {
 		super();
 		this.user = new User(username, password);
 		this.producer = producer;
 		this.session = session;		
+		this.replyTo = "";
 		try {
 			this.oriQueue = session.createTemporaryQueue();
 			// oriQueue = address of this client 
@@ -64,6 +66,10 @@ public class ChatClient implements MessageListener{
 					userMsg = userMsg.substring(3);
 					this.whisper(userMsg);
 			}
+			else if (!this.replyTo.equals("") &&
+					userMsg.substring(0, 3).equals("/r ")){
+				this.whisper(userMsg);
+			}
 			else if (userMsg.length() >= 5 &&
 					 userMsg.substring(0, 5).equals("/help")) {
 				this.help();
@@ -99,6 +105,22 @@ public class ChatClient implements MessageListener{
 			System.out.println("Please use '/help' for a list of commands");
 			return;
 		}
+		if (userMsg.substring(0, 3).equals("/r ")) {
+			String toUser = this.replyTo;
+			userMsg = userMsg.substring(userMsg.indexOf(" ") + 1);
+			TextMessage wMsg;
+			try {
+				wMsg = session.createTextMessage(userMsg);
+				wMsg.setJMSType("wMsg");
+				wMsg.setStringProperty("username", this.user.toString());
+				wMsg.setStringProperty("toUser", toUser);
+				wMsg.setJMSReplyTo(oriQueue);
+				producer.send(wMsg);
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
+			return;
+		}
 		String toUser = userMsg.substring(0, userMsg.indexOf(" "));
 		userMsg = userMsg.substring(userMsg.indexOf(" ") + 1);
 		TextMessage wMsg;
@@ -120,6 +142,7 @@ public class ChatClient implements MessageListener{
 		System.out.println("Here is a list of commands:");
 		System.out.println("To logout: '/logout'");
 		System.out.println("To whisper: '/w username message'");
+		System.out.println("To reply to recent whisper: '/r message'");
 	}
 	
 	/* Sends a TextMessage to the server of type logout with the user's name */
@@ -150,7 +173,6 @@ public class ChatClient implements MessageListener{
 	}
 	
 	public void sendMessageTo( String receipients, String message ) throws JMSException {
-		
 		TextMessage toSend = session.createTextMessage( message );
 		toSend.setObjectProperty( "receipients", receipients );
 		toSend.setJMSReplyTo( oriQueue );
@@ -162,7 +184,12 @@ public class ChatClient implements MessageListener{
 		//deal with message from server
 		try {
 			msg.acknowledge(); // acknowledge to know that it is already received
-			System.out.println(((TextMessage)msg).getText());
+			String received = ((TextMessage)msg).getText(); 
+			System.out.println(received);
+			if (received.substring(0, 1).equals(">")) {
+				this.replyTo = received.substring(received.indexOf(" ", 11 ) + 1,
+						received.indexOf(":"));
+			}
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
