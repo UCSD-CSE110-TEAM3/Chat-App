@@ -36,6 +36,7 @@ public class ChatClient implements MessageListener{
 			e.printStackTrace();
 		}
 		this.logon();
+		startBroadChat();
 	} 
 
 	/* Send a TextMessage to the server of type login with the user's name */
@@ -46,10 +47,8 @@ public class ChatClient implements MessageListener{
 			logon.setJMSType("login");
 			logon.setJMSReplyTo(oriQueue);
 			producer.send(logon);
-			System.out.println( "logged on" );
 		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println( "ERROR: Logging on unsuccessful. Check if Server is running.");
 		}
 		return;
 	}
@@ -153,7 +152,6 @@ public class ChatClient implements MessageListener{
 			logout.setJMSType("logout");
 			logout.setJMSReplyTo(oriQueue);
 			producer.send(logout);
-			System.out.println( "logging out" );
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

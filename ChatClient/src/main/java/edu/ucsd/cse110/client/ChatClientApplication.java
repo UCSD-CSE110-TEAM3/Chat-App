@@ -53,15 +53,12 @@ public class ChatClientApplication {
 				ActiveMQConnection.makeConnection(
 				/*Constants.USERNAME, Constants.PASSWORD,*/ Constants.ACTIVEMQ_URL);
         connection.start();
-        CloseHook.registerCloseHook(connection);//ignore
+        CloseHook.registerCloseHook(connection);
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE); 
         // make a queue that server will listen to
         Queue destQueue = session.createQueue(Constants.DESTQUEUE);
         // producer sends messages to server
         MessageProducer producer = session.createProducer(destQueue);
-        /*
-        Queue oriQueue = oriQueue = session.createTemporaryQueue();
-        MessageConsumer consumer = session.createConsumer(oriQueue);*/
         
         // make them log in to get their name to put in the constructor
         return new ChatClient(producer, session, username, password);
@@ -82,19 +79,16 @@ public class ChatClientApplication {
 	        String password = scanner.next();
 	        ChatClient client = wireClient( username, password );
 			// Now we can happily send messages around
-	        client.startBroadChat();
 
-	        
-			//client.sendMessageTo( "", "Hi" );
 	        //client.logout();
-	        client.logout();
 	        //System.exit(0);
 	        
 		} catch (JMSException e) {
-			e.printStackTrace();
-			
+			System.out.println( "ERROR: Failed to wire client. Server might be offline. ");
+			System.exit(1);
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			System.out.println( "ERROR: Failed to wire client. Check if URI is correct.");
+			System.exit(1);
 		}
 
 	}

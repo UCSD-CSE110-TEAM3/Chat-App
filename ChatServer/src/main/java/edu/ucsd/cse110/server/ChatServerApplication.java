@@ -32,7 +32,7 @@ public class ChatServerApplication {
     
     @Bean
     MessageListenerAdapter receiver() {
-        return new MessageListenerAdapter(new Server()) {{
+        return new MessageListenerAdapter(server()) {{
         	setDefaultListenerMethod( "receive");
         	setMessageConverter(null);
         }};
@@ -53,6 +53,13 @@ public class ChatServerApplication {
         return new JmsTemplate(connectionFactory);
     }
     
+    @Bean
+    Server server() {
+    	return new Server() {{
+    		setSender(jmsTemplate(connectionFactory()));
+    	}};
+    }
+    
 
 	public static void main(String[] args) throws Throwable {
 		BrokerService broker = new BrokerService();
@@ -61,7 +68,7 @@ public class ChatServerApplication {
 		broker.start();
 		AnnotationConfigApplicationContext context = 
 		          new AnnotationConfigApplicationContext(ChatServerApplication.class);
-		
+		/*
 		MessageCreator messageCreator = new MessageCreator() {
 			public Message createMessage(Session session) throws JMSException {
 				return session.createTextMessage("ping!");
@@ -71,12 +78,9 @@ public class ChatServerApplication {
         //JmsTemplate jmsTemplate = context.getBean(JmsTemplate.class);
         
         //jmsTemplate.send(Constants.QUEUENAME, messageCreator);
-        /*
-        MessageListenerAdapter mla = context.getBean(MessageListenerAdapter.class);*/
         
-        //Message sent = jmsTemplate.receive( Constants.QUEUENAME );
-        //new Server().receive( ((TextMessage)sent).getText() );
-        //context.close();
+        
+        //context.close();*/
 	}
 
 }

@@ -15,12 +15,48 @@ import org.springframework.jms.core.MessageCreator;
 
 public class Server{
 	JmsTemplate template;
-	HashMap<String, Destination> online;
+	private HashMap<String, Destination> online;
+	private HashMap<String, String> accounts; //the accounts that is loaded to memory for now.
 	
-	public Server() {
+	public Server( ) {
 		ActiveMQConnectionFactory factory= new ActiveMQConnectionFactory(Constants.ACTIVEMQ_URL);
 		template = new JmsTemplate(factory);
+		//template = jmsTemplate;
 		online = new HashMap<String, Destination>();
+	}
+	//puts in hashmap and writes to disk
+	public boolean make_account(String user, String password){
+		
+		if (!user_exists(user)){
+			accounts.put(user, password);
+			try {
+			save_accounts();
+			} catch (IOException e) {
+			System.out.println("accounts not saved");
+		}
+			return true;
+		}
+		
+		return false;
+	}
+	
+	
+	
+	public void setSender( JmsTemplate jmsTemplate ) {
+		this.template = jmsTemplate;
+	}
+	
+	//logs in by checking if account exsists and password matches in hashmap
+	public boolean valid_login(String user, String password) {
+		
+		if (password == null) {
+			return false;
+		}
+		if (this.accounts.get(user)==password) {
+			return true;
+		}
+		return false; 
+		
 	}
 	
 	public void receive(Message msg) throws JMSException {
@@ -31,6 +67,7 @@ public class Server{
 			this.login( user, dest );
 			template.convertAndSend( dest, "Logged onto server ");
 			this.broadcastAll( user + " has logged on" );
+			template.convertAndSend( dest, "Enter '/help' for chat commands.");
 			return;
 		}
 		// if broadcast msg
