@@ -22,6 +22,7 @@ public class ChatClient implements MessageListener{
 	private String replyTo;
 	
 	private boolean loginInProgress = false;
+	private boolean registerInProgress = false;
 	
 	public ChatClient(MessageProducer producer, Session session, String username, String password) {
 		super();
@@ -40,12 +41,11 @@ public class ChatClient implements MessageListener{
 			System.out.println( "ERROR: Failed to construct ChatClient.");
 			System.exit(1);
 		}
-		this.loginInProgress = true;
-		this.logon();
 	}
 	
 	public void register() {
 		Message registerMsg;
+		this.registerInProgress = true;
 		try {
 			registerMsg = msgFactory.createMessage("register", user.toString()+":"+user.getPassword());
 			producer.send(registerMsg);
@@ -59,6 +59,7 @@ public class ChatClient implements MessageListener{
 	/* Send a TextMessage to the server of type login with the user's name */
 	public void logon() {
 		Message logonMsg;
+		this.loginInProgress = true;
 		try {
 			logonMsg = msgFactory.createMessage("login", user.toString()+":"+user.getPassword());
 			producer.send(logonMsg);
@@ -76,7 +77,6 @@ public class ChatClient implements MessageListener{
 			logoutMsg = msgFactory.createMessage("logout");
 			producer.send(logoutMsg);
 		} catch (JMSException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
 	}
@@ -201,6 +201,7 @@ public class ChatClient implements MessageListener{
 	public boolean isLogOn(){
 		return this.user.online();
 	}
+	
 	public User getUser() {
 		return user;
 	}

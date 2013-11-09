@@ -4,6 +4,7 @@ public class User {
 	private String username;
 	private String password;
 	private boolean online;
+	private boolean register;
 	
 	public User(String username, String password){
 		this.username = username;
@@ -47,6 +48,10 @@ public class User {
 	
 	public boolean online(){
 		return online;
+	}
+	
+	public boolean register(){
+		return register;
 	}
 	
 	public void setOnlineStatus(boolean status){

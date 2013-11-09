@@ -85,7 +85,7 @@ public class ChatClientApplication {
 
 	private static void promptCommands() {
 		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
-		System.out.println("COMMANDS");
+		System.out.println("MENU");
 		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
 		System.out.println("register\t--\t/register");
 		System.out.println("login\t\t--\t/login");
@@ -97,14 +97,14 @@ public class ChatClientApplication {
 		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
 		System.out.println("REGISTER");
 		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
-		System.out.println("Enter desired username.");
+		System.out.println("Enter your username.");
 		System.out.print("Username: ");
 		username = scanner.next();
-		System.out.println("Enter your password(Min. 6 characters)");
+		System.out.println("Enter your password");
 		System.out.print("Password: ");
 		password = scanner.next();
 	}
-
+	
 	public static void main(String[] args) {
 		System.out.println("\t\tWHISPER ME");
 		ChatClient client;
@@ -125,6 +125,7 @@ public class ChatClientApplication {
 				promptRegister();
 				client = wireClient(username, password);
 				client.register();
+				listenForRegisterStatus(client);
 			} else {
 				System.out.println("Enter a valid command");
 				promptCommands();
@@ -163,5 +164,20 @@ public class ChatClientApplication {
 		return;
 
 	}
+	private static void listenForRegisterStatus(ChatClient client) {
+		long clock = 0; // Start a clock time
+		System.out.print("Registering account");
+		while (client.loginInProgress() == true) { // Exit loop after attempt
+													// login
+			++clock;
+			if (clock % 100000 == 0) { // Print "." at every iteration
+				System.out.print(".");
+			}
+		}
+
+		return;
+
+	}
+
 
 }
