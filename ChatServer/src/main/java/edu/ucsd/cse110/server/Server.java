@@ -56,53 +56,59 @@ public class Server{
 			 
 
 	}
-	//dumps pairs in hashmap to disk
-	public void save_accounts() throws IOException {
-		
-		 FileWriter f0 = null;
-		 f0 = new FileWriter("user_accounts.txt");
-		 
-		 String nl = System.getProperty("line.separator"); // '/n' not very portable
-		 
-		 //Dumping all key, values into file , line by line
-		 //dumps it in this format
-			 // user01:password01
-			 // user02:password02
-			 
-			 //System.out.println("key : " + key)
-			 //System.out.println("value : " + accounts.get(key));
-			 
-		 for (String key: accounts.keySet()) {
-			 f0.write( key +":"+ accounts.get(key)+nl);
-		 }
-		 
-         	f0.close();
-		 
-		 
+	
+	/*
+	 * This private method writes username and password into file.
+	 * It will write even if null. 
+	 * 
+	 * Throw IOException if file could not be open
+	 */
+	private void save_accounts(String user, String password) throws IOException {
+		 FileWriter f0 = new FileWriter("user_accounts.txt", true);
+		 f0.write( user+":"+password+"\n");
+		 f0.close();
+		 	 
 	}
-	//checks from hashmap
-	public boolean user_exists(String input) {
-		
+
+
+	/*
+	 * This private method checks if username is in our current hashmap
+	 */
+	private boolean user_exists(String input) {
 		if (this.accounts.get(input)!=null) {
 			return true;	
 		} 	
 		return false;	
 		
 	}
-	//puts in hashmap and writes to disk
-	public boolean make_account(String user, String password){
-		
-		if (!user_exists(user)){
-			accounts.put(user, password);
-			try {
-			save_accounts();
-			} catch (IOException e) {
-			System.out.println("accounts not saved");
+
+	/*
+	 * This private method will check if username and password are valid 
+	 * for registration. If they are it will call method to write to file.
+	 * 
+	 * Check code for reasons of failure
+	 */
+	private void registerUser(String user, String password) throws RegistrationException{
+		if(user == null || password == null){
+			throw new RegistrationException("Username or password was inValid.");
 		}
-			return true;
+		if(user_exists(user)){
+			throw new RegistrationException("Username already exist.");
+		}
+		if(password.length() < 6){
+			throw new RegistrationException("Password must be at least 6 characters long.");
 		}
 		
-		return false;
+		try {
+			save_accounts(user, password);
+		} catch (IOException e) {
+			throw new RegistrationException("Server was not able to save your account.");
+		}
+	
+		accounts.put(user, password);
+		
+		return;
+
 	}
 	
 	
@@ -129,6 +135,18 @@ public class Server{
 	
 	
 	public void receive(Message msg) throws JMSException {
+		// if registering user
+		if ( msg.getJMSType() != null && msg.getJMSType().equals("register") ) {
+			String[] userData = ((TextMessage)msg).getText().split(":");
+			try{
+				registerUser(userData[0], userData[1]);
+				template.convertAndSend(msg.getJMSReplyTo(), "Your account has been registered.\nYou can now logon and whisper.");
+			}catch(RegistrationException e){
+				template.convertAndSend(msg.getJMSReplyTo(), e.getCause() );
+			}
+
+			return;
+		}else
 		// if login
 		if ( msg.getJMSType() != null && msg.getJMSType().equals("login") ) {
 			String[] userData = ((TextMessage)msg).getText().split(":");
