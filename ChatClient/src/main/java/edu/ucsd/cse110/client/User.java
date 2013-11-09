@@ -40,6 +40,11 @@ public class User {
 		return username;
 	}
 	
+	
+	public String getPassword(){
+		return password;
+	}
+	
 	public boolean online(){
 		return online;
 	}
@@ -59,4 +64,6 @@ public class User {
 				+ ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
+
+
 }

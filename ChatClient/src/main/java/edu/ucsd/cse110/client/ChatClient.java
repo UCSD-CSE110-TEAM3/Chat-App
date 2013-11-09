@@ -21,6 +21,8 @@ public class ChatClient implements MessageListener{
 	private Queue originQueue;
 	private String replyTo;
 	
+	private boolean loginInProgress = false;
+	
 	public ChatClient(MessageProducer producer, Session session, String username, String password) {
 		super();
 		this.user = new User(username, password);
@@ -38,15 +40,18 @@ public class ChatClient implements MessageListener{
 			System.out.println( "ERROR: Failed to construct ChatClient.");
 			System.exit(1);
 		}
+		this.loginInProgress = true;
 		this.logon();
+
 	} 
 
 	/* Send a TextMessage to the server of type login with the user's name */
 	public void logon() {
 		Message logonMsg;
 		try {
-			logonMsg = msgFactory.createMessage("login");
+			logonMsg = msgFactory.createMessage("login", user.toString()+":"+user.getPassword());
 			producer.send(logonMsg);
+			
 		} catch (JMSException e) {
 			System.out.println( "ERROR: Logging on unsuccessful. Check if Server is running.");
 		}
@@ -155,7 +160,19 @@ public class ChatClient implements MessageListener{
 		//deal with message from server
 		try {
 			msg.acknowledge(); // acknowledge to know that it is already received
-			String received = ((TextMessage)msg).getText(); 
+			String received = ((TextMessage)msg).getText();
+			
+			
+			if(received.equals("!loginFailed")){
+				this.loginInProgress = false;
+				System.out.println("\n!Login Failed: Username or password is incorrect. ");
+				return;
+			}else{
+				this.user.setOnlineStatus(true);
+				this.loginInProgress = false;
+							
+			}
+			
 			System.out.println(received);
 			if (received.substring(0, 1).equals(">")) {
 				this.replyTo = received.substring(received.indexOf(" ", 11 ) + 1,
@@ -168,6 +185,12 @@ public class ChatClient implements MessageListener{
 		return;
 	}
 	
+	public boolean loginInProgress(){
+		return this.loginInProgress;
+	}
+	public boolean isLogOn(){
+		return this.user.online();
+	}
 	public User getUser() {
 		return user;
 	}

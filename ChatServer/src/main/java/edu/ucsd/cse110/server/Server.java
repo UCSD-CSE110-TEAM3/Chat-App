@@ -29,7 +29,6 @@ public class Server{
 	
 	public Server( ) {
 		online = new HashMap<String, Destination>();
-		
 		accounts = new HashMap<String, String>();
 		
 		try {
@@ -111,11 +110,13 @@ public class Server{
 	//logs in by checking if account exsists and password matches in hashmap
 	public boolean valid_login(String user, String password) {
 		
-		if (password == null) {
+		if ((password == null)||(user==null)) {
 			return false;
 		}
-		if (this.accounts.get(user)==password) {
-			return true;
+		if (this.accounts.get(user)!=null) {
+			if (this.accounts.get(user).equals(password)) {
+				return true;
+			}
 		}
 		return false; 
 		
@@ -130,12 +131,19 @@ public class Server{
 	public void receive(Message msg) throws JMSException {
 		// if login
 		if ( msg.getJMSType() != null && msg.getJMSType().equals("login") ) {
-			String user = msg.getStringProperty("username");
-			Destination dest = msg.getJMSReplyTo();
-			this.login( user, dest );
-			template.convertAndSend( dest, "Logged onto server ");
-			this.broadcastAll( user + " has logged on" );
-			template.convertAndSend( dest, "Enter '/help' for chat commands.");
+			String[] userData = ((TextMessage)msg).getText().split(":");
+			if(this.valid_login(userData[0], userData[1])){
+				template.convertAndSend(msg.getJMSReplyTo(), "\nLogging In...");
+				Destination dest = msg.getJMSReplyTo();
+				this.login(userData[0], dest );
+				template.convertAndSend( dest, "Logged onto server ");
+				this.broadcastAll( userData[0] + " has logged on" );
+				template.convertAndSend( dest, "Enter '/help' for chat commands.");
+
+			}else{
+				template.convertAndSend(msg.getJMSReplyTo(), "!loginFailed");
+			}
+			
 			return;
 		}
 		// if broadcast msg

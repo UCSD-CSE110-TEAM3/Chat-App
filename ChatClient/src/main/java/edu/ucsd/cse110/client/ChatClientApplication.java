@@ -68,7 +68,7 @@ public class ChatClientApplication {
 	}
 	
 	private static void promptLogin() {
-        System.out.println("Enter your username.");
+		System.out.println("Enter your username.");
         System.out.print("Username: ");
         username = scanner.next();
         System.out.println("Enter your password");
@@ -77,14 +77,23 @@ public class ChatClientApplication {
 	}
 	
 	public static void main(String[] args) {
+		ChatClient client;
+
 		try {
+			do{
 			promptLogin();
 			/* 
 			 * We have some other function wire type ChatClient 
 			 * to the communication platform
 			 */
-	        ChatClient client = wireClient( username, password );
-			// Now we can happily send messages around
+	         client = wireClient( username, password );
+	         listenForLoginStatus(client);    // Wait for login attempt to finish
+	         
+	         
+			}while(!client.isLogOn());        // Loop until client online status is true
+			
+			
+	        // Now we can happily send messages around
 	        client.startBroadChat();
 	        //client.logout();
 	        //System.exit(0);
@@ -97,6 +106,29 @@ public class ChatClientApplication {
 			System.exit(1);
 		}
 
+	}
+    
+	/* 
+     * This method was designed to allow the client to 
+     * properly update its status before main() checks 
+     * it in the condition loop
+     * 
+     * - We might also want to add a loginTimeOutError 
+     *   in case logging in is taking too long. i.e
+     *   there is an infinite loop.
+     */
+	private static void listenForLoginStatus(ChatClient client){
+		long clock = 0;                                 // Start a clock time
+		System.out.print("Checking account");           
+		while(client.loginInProgress() == true){        // Exit loop after attempt login
+			++clock;
+			if(clock%100000 == 0){                      // Print "." at every iteration
+				System.out.print(".");
+			}
+		}
+		
+		return;
+		
 	}
 
 }
