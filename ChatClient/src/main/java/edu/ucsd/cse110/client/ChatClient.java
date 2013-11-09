@@ -42,8 +42,19 @@ public class ChatClient implements MessageListener{
 		}
 		this.loginInProgress = true;
 		this.logon();
-
-	} 
+	}
+	
+	public void register() {
+		Message registerMsg;
+		try {
+			registerMsg = msgFactory.createMessage("register", user.toString()+":"+user.getPassword());
+			producer.send(registerMsg);
+			
+		} catch (JMSException e) {
+			System.out.println( "ERROR: Registration on unsuccessful. Check if Server is running.");
+		}
+		return;
+	}
 
 	/* Send a TextMessage to the server of type login with the user's name */
 	public void logon() {
@@ -100,7 +111,7 @@ public class ChatClient implements MessageListener{
 			}
 		}
 		//close the scanner
-
+		scanner.close();
 		//end chat broadcasting
 		return;
 	}
@@ -179,7 +190,6 @@ public class ChatClient implements MessageListener{
 						received.indexOf(":"));
 			}
 		} catch (JMSException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return;
