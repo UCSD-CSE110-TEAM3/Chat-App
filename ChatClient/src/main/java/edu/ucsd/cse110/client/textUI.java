@@ -6,6 +6,9 @@ public class textUI {
 	private static Scanner scanner = new Scanner(System.in);
 	private Scanner cmdScanner = new Scanner(System.in);
 	private int cmd = 0;
+	
+	protected static String username;
+	protected static String password;
 
 	public textUI() {
 	}
@@ -54,10 +57,10 @@ public class textUI {
 		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
 		System.out.println("Enter your username.");
 		System.out.print("Username: ");
-		String username = scanner.next();
+		username = scanner.next();
 		System.out.println("Enter your password");
 		System.out.print("Password: ");
-		String password = scanner.next();
+		password = scanner.next();
 	}
 
 	private static void promptRegister() {
@@ -66,10 +69,10 @@ public class textUI {
 		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
 		System.out.println("Enter your username.");
 		System.out.print("Username: ");
-		String username = scanner.next();
+		username = scanner.next();
 		System.out.println("Enter your password");
 		System.out.print("Password: ");
-		String password = scanner.next();
+		password = scanner.next();
 	}
 
 	private void promptMenu() {

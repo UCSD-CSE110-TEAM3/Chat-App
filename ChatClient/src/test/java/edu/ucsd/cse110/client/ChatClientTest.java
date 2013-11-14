@@ -19,9 +19,9 @@ public class ChatClientTest {
 	
 	@Before
 	private void setUp(){
-		testClientSender = new ChatClient(null, null);
-		testClientReceiver1 = new ChatClient(null, null);
-		testClientReceiver2 = new ChatClient(null, null);
+		testClientSender = new ChatClient(null, null, "sender", "test");
+		testClientReceiver1 = new ChatClient(null, null, "receiver1", "test");
+		testClientReceiver2 = new ChatClient(null, null, "receiver2", "test");
 	}
 	
 	@After
