@@ -12,10 +12,9 @@ import javax.jms.Session;
 import org.apache.activemq.ActiveMQConnection;
 
 public class ChatClientApplication {
-	private static Scanner scanner = new Scanner(System.in);
+
 	private static String username;
 	private static String password;
-	private static String command;
 
 	/*
 	 * This inner class is used to make sure we clean up when the client closes
@@ -52,7 +51,7 @@ public class ChatClientApplication {
 	 * ChatClient does not depend on ActiveMQ (the concrete communication
 	 * platform we use) but just in the standard JMS interface.
 	 */
-	private static ChatClient wireClient(String username, String password)
+	private static ChatClient wireClient()
 			throws JMSException, URISyntaxException {
 		ActiveMQConnection connection =
 		// make a connection to the server (localhost)
@@ -68,69 +67,43 @@ public class ChatClientApplication {
 		MessageProducer producer = session.createProducer(destQueue);
 
 		// make them log in to get their name to put in the constructor
-		return new ChatClient(producer, session, username, password);
-	}
-
-	private static void promptLogin() {
-		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
-		System.out.println("LOGIN");
-		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
-		System.out.println("Enter your username.");
-		System.out.print("Username: ");
-		username = scanner.next();
-		System.out.println("Enter your password");
-		System.out.print("Password: ");
-		password = scanner.next();
-	}
-
-	private static void promptCommands() {
-		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
-		System.out.println("MENU");
-		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
-		System.out.println("register\t--\t/register");
-		System.out.println("login\t\t--\t/login");
-		System.out.println("quit\t\t--\t/quit");
-		command = scanner.next();
-	}
-	
-	private static void promptRegister(){
-		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
-		System.out.println("REGISTER");
-		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
-		System.out.println("Enter your username.");
-		System.out.print("Username: ");
-		username = scanner.next();
-		System.out.println("Enter your password");
-		System.out.print("Password: ");
-		password = scanner.next();
+		return new ChatClient(producer, session);
 	}
 	
 	public static void main(String[] args) {
-		System.out.println("\t\tWHISPER ME");
-		ChatClient client;
+		//Scanner cmdScanner = new Scanner(System.in);
+/*
+
+		textUI UI;
+		promptCommands();
+		String value = cmdScanner.next();
+		*/
 		try {
-			// prompt for command
-			promptCommands();
-			if (command.equals("/quit")) {
+			ChatClient client = wireClient();
+			textUI UI = new textUI();
+			UI.run();
+		
+		/*
+			if (value.equals("/q")) {
 				System.out.println("Quitting...");
 				System.exit(1);
-			} else if (command.equals("/login")) {
+			} else if (value.equals("/l")) {
 				promptLogin();
 				do {
 					client = wireClient(username, password);
 					listenForLoginStatus(client);
 				} while (!client.isLogOn());
 				client.startBroadChat();
-			} else if (command.equals("/register")) {
+			} else if (value.equals("/rg")) {
 				promptRegister();
 				client = wireClient(username, password);
 				client.register();
 				listenForRegisterStatus(client);
-			} else {
-				System.out.println("Enter a valid command");
+			} else if (value.equals("/cmd"))
 				promptCommands();
-			}
-
+			else
+				System.out.println("Enter a valid command\nType /cmd for menu");
+*/
 		} catch (JMSException e) {
 			System.out
 					.println("ERROR: Failed to wire client. Server might be offline. ");
@@ -138,6 +111,9 @@ public class ChatClientApplication {
 		} catch (URISyntaxException e) {
 			System.out
 					.println("ERROR: Failed to wire client. Check if URI is correct.");
+			System.exit(1);
+		} catch (Exception e){
+			System.out.println("Unknown error");
 			System.exit(1);
 		}
 
