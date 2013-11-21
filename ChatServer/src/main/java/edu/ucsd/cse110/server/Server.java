@@ -65,7 +65,7 @@ public class Server{
 	 */
 	private void save_accounts(String user, String password) throws IOException {
 		 FileWriter f0 = new FileWriter("user_accounts.txt", true);
-		 f0.write( user+":"+password+"\n");
+		 f0.write( user+":"+password);
 		 f0.close();
 		 	 
 	}
@@ -141,7 +141,7 @@ public class Server{
 			try{
 				registerUser(userData[0], userData[1]);
 				template.convertAndSend(msg.getJMSReplyTo(), "Your account has been registered.\nYou can now logon and whisper.");
-			}catch(RegistrationException e){
+			}catch(Exception e){
 				template.convertAndSend(msg.getJMSReplyTo(), e.getCause() );
 			}
 
