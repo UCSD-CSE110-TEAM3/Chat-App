@@ -7,27 +7,38 @@ public class textUI {
 	private Scanner cmdScanner = new Scanner(System.in);
 	private int cmd = 0;
 	
-	protected static String username;
-	protected static String password;
+	protected boolean registering = false;
 
+	protected String username = "";
+	protected String password = "";
+
+	/**
+	 * Constructor for initializing data of the UI
+	 */
 	public textUI() {
 	}
 
+	/**
+	 * will run the UI, and prompt user with command menu
+	 * 
+	 */
 	public void run() {
 		boolean quitcmd = false;
-
-		System.out.println("\t\tWHISPER ME");
-		promptMenu();
 		do {
+			promptMenu();
 			String input = cmdScanner.next();
 			cmd = getCmd(input);
 			if (validInput(cmd))
 				switch (cmd) {
 				case 0:
 					promptRegister();
+					registering = true;
+					quitcmd = true;
 					break;
 				case 1:
 					promptLogin();
+					if(username != null && password != null)
+						quitcmd = true;
 					break;
 				case 2:
 					promptMenu();
@@ -35,14 +46,15 @@ public class textUI {
 				case 3:
 					cmdScanner.close();
 					System.exit(1);
+					quitcmd = true;
+					System.out.println("Quitting ...");
 					break;
 				default:
 					break;
 				}
 			else
-				System.out.println("Enter Valid Command\n/cmd for main menu");
+				System.out.println("Enter Valid Command\n/cmd for cmd menu");
 		} while (!quitcmd);
-		System.out.println("Quitting ...");
 	}
 
 	private boolean validInput(int cmd) {
@@ -51,7 +63,7 @@ public class textUI {
 		return false;
 	}
 
-	private static void promptLogin() {
+	private void promptLogin() {
 		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
 		System.out.println("LOGIN");
 		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
@@ -61,18 +73,20 @@ public class textUI {
 		System.out.println("Enter your password");
 		System.out.print("Password: ");
 		password = scanner.next();
+		return;
 	}
 
-	private static void promptRegister() {
+	private void promptRegister() {
 		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
 		System.out.println("REGISTER");
 		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
-		System.out.println("Enter your username.");
+		System.out.println("Enter desired username.");
 		System.out.print("Username: ");
 		username = scanner.next();
-		System.out.println("Enter your password");
+		System.out.println("Enter desired password");
 		System.out.print("Password: ");
 		password = scanner.next();
+		return;
 	}
 
 	private void promptMenu() {
@@ -81,6 +95,7 @@ public class textUI {
 		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
 		System.out.println("register\t--\t/rg");
 		System.out.println("login\t\t--\t/l");
+		System.out.println("cmd menu\t--\t/cmd");
 		System.out.println("quit\t\t--\t/q");
 	}
 

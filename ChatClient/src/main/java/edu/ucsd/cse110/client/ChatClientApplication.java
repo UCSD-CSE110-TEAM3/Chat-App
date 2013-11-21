@@ -13,9 +13,6 @@ import javax.jms.Session;
 import org.apache.activemq.ActiveMQConnection;
 
 public class ChatClientApplication {
-	private static Scanner scanner = new Scanner(System.in);
-	private static String username;
-	private static String password;
 
 	/*
 	 * This inner class is used to make sure we clean up when the client closes
@@ -71,27 +68,26 @@ public class ChatClientApplication {
 		return new ChatClient(producer, session, username, password);
 	}
 
-	private static void promptLogin() {
-		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
-		System.out.println("LOGIN");
-		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++");
-		System.out.println("Enter your username.");
-		System.out.print("Username: ");
-		username = scanner.next();
-		System.out.println("Enter your password");
-		System.out.print("Password: ");
-		password = scanner.next();
-	}
 
 	public static void main(String[] args) {
 		ChatClient client;
 		try {
 			do {
-				// textUI UI = new textUI();
-				// UI.run();
-				promptLogin();
-				client = wireClient(username, password);
-				listenForLoginStatus(client);
+				System.out.println("\t\tWHISPER ME");
+				textUI UI = new textUI();
+				UI.run();
+				if(UI.registering){
+					client = wireClient(UI.username, UI.password);
+					client.register();
+					listenForRegisterStatus(client);
+					client.logon();
+					listenForLoginStatus(client);
+				}
+				else{
+					client = wireClient(UI.username, UI.password);
+					client.logon();
+					listenForLoginStatus(client);
+				}
 			} while (!client.isLogOn());
 			
 			client.startBroadChat();
@@ -121,7 +117,7 @@ public class ChatClientApplication {
 		while (client.loginInProgress() == true) { // Exit loop after attempt
 													// login
 			++clock;
-			if (clock % 7 == 0) { // Print "." at every iteration
+			if (clock % 3 == 1) { // Print "." at every iteration
 				System.out.print(".");
 			}
 		}
@@ -136,7 +132,7 @@ public class ChatClientApplication {
 		while (client.loginInProgress() == true) { // Exit loop after attempt
 													// login
 			++clock;
-			if (clock % 100000 == 0) { // Print "." at every iteration
+			if (clock % 2 == 0) { // Print "." at every iteration
 				System.out.print(".");
 			}
 		}
