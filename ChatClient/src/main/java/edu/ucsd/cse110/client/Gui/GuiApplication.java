@@ -65,7 +65,7 @@ public class GuiApplication implements CommandHandler{
 			attemptLogin();
 		}else{
 		  if(loginWindow != null)
-			loginWindow.notifyFailLogin();
+			loginWindow.notifyFailLogin(command.getLogMessage());
 		}
 	}
 	public void receiveWhisper(Commands command) {

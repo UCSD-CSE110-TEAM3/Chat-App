@@ -10,6 +10,7 @@ import javax.swing.*;
 import Commands.CommandHandler;
 import Commands.Commands;
 import Commands.LoginCommand;
+import Commands.RegisterCommand;
 
 public class LoginPanel extends JPanel {
 	private GridBagConstraints grid = new GridBagConstraints();
@@ -27,14 +28,39 @@ public class LoginPanel extends JPanel {
 
 	public LoginPanel() {
 		super();
+		setLayout(new GridBagLayout());
 		grid.insets = new Insets(0, 10, 5, 10);
+		login.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(username.getText()!=null && password.getPassword()!= null){
+					commandHandler.sendCommand(new LoginCommand(username
+						.getText(), new String(password.getPassword())));
+					waitForRespond();
+				}
+				
+			}
+		});
+		register.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(username.getText()!=null && password.getPassword()!= null){
+					commandHandler.sendCommand(new RegisterCommand(username
+						.getText(), new String(password.getPassword())));
+					waitForRespond();
+				}
+				
+			}
+		});
+		
+		
 	}
 
 	public void paintComponent(Graphics g) {
-		add(log);
-		setLayout(new GridBagLayout());
 		super.paintComponent(g);
+		grid.gridy = 0;
 		grid.gridx = 0;
+		grid.gridwidth = 2;
+		add(log, grid);
+		grid.gridwidth = 1;
 		grid.gridy = 1;
 		add(user, grid);
 		grid.gridx = 1;
@@ -49,18 +75,7 @@ public class LoginPanel extends JPanel {
 		add(register, grid);
 		grid.gridx = 1;
 		add(login, grid);
-
-		login.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				if(username.getText()!=null && password.getPassword()!= null){
-					commandHandler.sendCommand(new LoginCommand(username
-						.getText(), new String(password.getPassword())));
-					waitForRespond();
-				}
-				
-			}
-		});
+	
 	}
 
 	public Dimension getPreferredSize() {
@@ -74,16 +89,14 @@ public class LoginPanel extends JPanel {
 	public void waitForRespond() {
 		username.setEditable(false);
 		password.setEditable(false);
-
+		
 	}
-
+	
 	public void loginMessage(String message) {
-		if(!username.isEditable())
-			username.setEditable(true);
-		if(!username.isEditable())
-			password.setEditable(true);
-		
-		
+		username.setEditable(true);
+		password.setEditable(true);
+		log.setText(message);
+		repaint();
 	}
 
 

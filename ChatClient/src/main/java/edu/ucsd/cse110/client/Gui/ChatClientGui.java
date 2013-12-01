@@ -49,6 +49,7 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 	}
 	private void register(RegisterCommand command){
 		Message registerMsg;
+		setUser(command.getUser(), command.getPassword());
 		try {
 			registerMsg = msgFactory.createMessage("register", command.getUser()+":"+command.getPassword());
 			producer.send(registerMsg);
@@ -164,9 +165,10 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 			String received = ((TextMessage)msg).getText();
 			
 			if(!user.online()){
-				Commands command = new LoginCommand(user.toString(),user.getPassword());
+				LoginCommand command = new LoginCommand(user.toString(),user.getPassword());
 				if(received.equals("!loginFailed")){
 					command.setStatus(false);
+					command.setLogMessage("Username of Password is invalid");
 					sendCommand(command);
 				}
 				else{
