@@ -33,5 +33,10 @@ public class MainWindow extends JFrame {
 		add(broadcast, BorderLayout.LINE_END);
 		
 	}
+	
+	public void addUser(String username){
+		usersOnline.addUser(username);
+	}
+	
 
 }

@@ -62,7 +62,10 @@ public class GuiApplication implements CommandHandler{
 	public void receiveLogon(LoginCommand command){
 		
 		if(command.getStatus()){
-			attemptLogin();
+			if(loginWindow != null && mainWindow == null)
+				attemptLogin();
+			else
+			  mainWindow.addUser(command.getUsername());
 		}else{
 		  if(loginWindow != null)
 			loginWindow.notifyFailLogin(command.getLogMessage());
