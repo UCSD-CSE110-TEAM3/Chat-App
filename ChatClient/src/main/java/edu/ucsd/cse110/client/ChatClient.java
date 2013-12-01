@@ -24,6 +24,8 @@ public class ChatClient implements MessageListener{
 	private boolean loginInProgress = false;
 	private boolean registerInProgress = false;
 	
+	public ChatClient(){};
+	
 	public ChatClient(MessageProducer producer, Session session, String username, String password) {
 		super();
 		this.user = new User(username, password);
