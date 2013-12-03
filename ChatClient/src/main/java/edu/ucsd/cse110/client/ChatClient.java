@@ -108,6 +108,9 @@ public class ChatClient implements MessageListener{
 				this.logout();
 				return;
 			}
+			else if( userMsg.equals("/guo")){
+				this.getUsersOnline();
+			}
 			else {
 				this.allMsg(userMsg);
 			}
@@ -167,6 +170,7 @@ public class ChatClient implements MessageListener{
 		System.out.println("To logout: '/logout'");
 		System.out.println("To whisper: '/w username message'");
 		System.out.println("To reply to recent whisper: '/r message'");
+		System.out.println("To see who else is online:  /guo");
 	}
 	
 	public void onMessage( Message msg ) {
@@ -195,6 +199,16 @@ public class ChatClient implements MessageListener{
 			e.printStackTrace();
 		}
 		return;
+	}
+	
+	public void getUsersOnline(){
+		Message userMsg;
+		try {
+			userMsg = msgFactory.createMessage("getUsersOnline");
+			producer.send(userMsg);
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}			
 	}
 	
 	public boolean loginInProgress(){

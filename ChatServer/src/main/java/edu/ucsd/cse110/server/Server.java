@@ -3,7 +3,10 @@ package edu.ucsd.cse110.server;
 
 import java.util.HashMap;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.io.BufferedReader;
 import java.io.FileReader; 
 import java.io.FileWriter;
@@ -150,6 +153,7 @@ public class Server{
 		// if login
 		if ( msg.getJMSType() != null && msg.getJMSType().equals("login") ) {
 			String[] userData = ((TextMessage)msg).getText().split(":");
+			
 			if(this.valid_login(userData[0], userData[1])){
 				template.convertAndSend(msg.getJMSReplyTo(), "\nLogging In...");
 				Destination dest = msg.getJMSReplyTo();
@@ -160,6 +164,7 @@ public class Server{
 
 			}else{
 				template.convertAndSend(msg.getJMSReplyTo(), "!loginFailed");
+				
 			}
 			
 			return;
@@ -189,6 +194,12 @@ public class Server{
 			this.broadcastAll( user + " has logged out" );
 			return;
 		}
+		if ( msg.getJMSType() != null && msg.getJMSType().equals("getUsersOnline") ) {
+			Destination dest = msg.getJMSReplyTo();
+			getUsers(dest);
+			
+			return;
+		}
 		try {
 			System.out.println(((TextMessage)msg).getText());
 		} catch (JMSException e) {
@@ -199,6 +210,20 @@ public class Server{
 		
 	}
 	
+	private void  getUsers(Destination dest) {
+		String users = "Users Online:";
+		Iterator<String> iterator = online.keySet().iterator();
+		String tempString;
+		while(iterator.hasNext()){
+			tempString = iterator.next();
+			if(!online.get(tempString).equals(dest))
+				users = users.concat("\n"+tempString);
+		}
+		
+		template.convertAndSend( dest, users );
+		
+	}
+
 	private void login( String user, Destination dest ) {
 		online.put(user, dest);
 	}
