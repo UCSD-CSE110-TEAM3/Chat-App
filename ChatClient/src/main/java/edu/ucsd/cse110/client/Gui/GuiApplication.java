@@ -78,8 +78,10 @@ public class GuiApplication implements CommandHandler{
 
 	}
 
-	public void receiveBroadcast(Commands command) {
-		// TODO Auto-generated method stub
+	public void receiveBroadcast(BroadcastCommand command) {
+		if(mainWindow != null){
+			mainWindow.displayBroadcast(command.getMessage());
+		}
 
 	}
 
@@ -115,7 +117,7 @@ public class GuiApplication implements CommandHandler{
 			
 			break;
 		case Commands.BROADCAST:
-			
+			this.receiveBroadcast((BroadcastCommand)command);
 			break;
 		case Commands.REGISTER:
 			

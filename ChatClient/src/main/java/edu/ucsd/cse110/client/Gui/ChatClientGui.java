@@ -209,6 +209,7 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 			}else if( received.contains(">whisper from ")){
 				sendCommand(new WhisperCommand(received.split(" :")[2], received.replace(">whisper from ", "")));
 			}else{
+				System.out.println(received);
 				sendCommand(new BroadcastCommand(received));
 			}
 			

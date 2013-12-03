@@ -14,13 +14,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import Commands.BroadcastCommand;
+import edu.ucsd.cse110.client.Gui.Controller;
+
 public class BroadcastPanel extends JPanel{
 	private static BroadcastPanel instance = new BroadcastPanel();
-
+	private Controller controller  = Controller.getInstance();
 	
 	private JTextArea broadcasts;
 	private JTextField message;
-	private String    outputStream;
     private JLabel heading;
     
 	private BroadcastPanel(){
@@ -44,10 +46,11 @@ public class BroadcastPanel extends JPanel{
 		message = new JTextField(25);
 		message.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				outputStream = message.getText();
-				updateYourHistory();
+				if(message.getText()!=""){
+					controller.sendCommand(new BroadcastCommand(message.getText()));
+				}
 				message.setText("");
-				//send broadcast to controller
+		
 			}
 		});
 		add(heading, BorderLayout.NORTH);
@@ -55,17 +58,17 @@ public class BroadcastPanel extends JPanel{
 		add(message, BorderLayout.SOUTH);
 	}
 	
-	public void updateYourHistory() {
-		if (outputStream != null) {
-			broadcasts.append(outputStream + "\n");
-		}
-		outputStream = null;
-	}
+
 	
 	public void updateHistory(String username, String message) {
 		if (message != null) {
 			broadcasts.append(username+": "+message + "\n");
 		}
+	}
+
+	public void displayBroadcast(String message) {
+		broadcasts.append(message +"\n");
+		
 	}
 	
 }

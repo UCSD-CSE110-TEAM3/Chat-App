@@ -48,6 +48,11 @@ public class MainWindow extends JFrame {
 		while(it.hasNext())
 			usersOnline.addUser(it.next());
 	}
+
+	public void displayBroadcast(String message) {
+		broadcast.displayBroadcast(message);
+		
+	}
 	
 
 }
