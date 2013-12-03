@@ -45,6 +45,7 @@ public class GuiApplication implements CommandHandler{
 		loginWindow.dispose();
 		loginWindow = null;
 		mainWindow = new MainWindow();
+		
 		mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainWindow.setSize(600, 600);
 		mainWindow.setVisible(true);
@@ -87,8 +88,9 @@ public class GuiApplication implements CommandHandler{
 
 	}
 
-	public void receiveUsers(Commands command) {
-		// TODO Auto-generated method stub
+	public void receiveUsers(CheckUsersCommand command) {
+		if(mainWindow != null)
+			mainWindow.addUser(command.getUsers());
 
 	}
 
@@ -119,7 +121,8 @@ public class GuiApplication implements CommandHandler{
 			
 			break;
 		case Commands.CHECKUSERS:
-
+			this.receiveUsers((CheckUsersCommand)command);
+			break;
 		}
 		
 	}

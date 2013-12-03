@@ -14,14 +14,14 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class UserDisplayPanel extends JPanel{
    private HashMap<String, JButton> users =  new HashMap<String, JButton>(0);
-   JLabel  heading = new JLabel("UsersOnline");
+   JLabel  heading = new JLabel("Users Online");
    public UserDisplayPanel(Set<String> usernames){
 	   super();
 	   
 	   JButton tempButton;
 	   String  tempuser;
 	   Iterator<String> iterator = usernames.iterator();
-	   //add(heading, BorderLayout.NORTH);
+	   add(heading);
 	   while(iterator.hasNext()){
 		   tempuser = iterator.next();
 		   if(tempuser == null)
@@ -40,6 +40,7 @@ public class UserDisplayPanel extends JPanel{
    public UserDisplayPanel(){
 	  super();
 	  this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	  add(heading);
    }
    
    public void addUser(String user){
@@ -65,6 +66,10 @@ public class UserDisplayPanel extends JPanel{
 	   // repaint
 	   
    }
+
+
+
+
    
    
    

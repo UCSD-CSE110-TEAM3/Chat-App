@@ -1,6 +1,8 @@
 package Commands;
 
 public abstract class Commands {
+
+
 	public static final int REGISTER = 0;
 	public static final int LOGIN = 1;
 	public static final int LOGOUT = 2;

@@ -110,7 +110,18 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 		}
 		return;
 	}
-    
+    private void getUsers(CheckUsersCommand command) {
+		
+		Message Msg;
+		try {
+			Msg = msgFactory.createMessage("getUsersOnline");
+			producer.send(Msg);
+		} catch (JMSException e) {
+			System.out.println( "Failed to get users.");
+		}
+		return;
+		
+	}
 	public void recieveCommand(Commands command) {
 		if (command == null) {
 			return;
@@ -133,7 +144,8 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 			register((RegisterCommand)command);
 			break;
 		case Commands.CHECKUSERS:
-
+			getUsers((CheckUsersCommand)command);
+			break;
 		}
 		
 	}
@@ -158,6 +170,8 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 	}
 	*/
 
+	
+
 	public void onMessage( Message msg ) {
 		//deal with message from server
 		try {
@@ -175,6 +189,15 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 				    setUserStatus(true);
 				    sendCommand(command);
 				}
+			}
+			else if( received.contains("Users Online:")){
+				String[] users = received.split("\n");
+				CheckUsersCommand command = new CheckUsersCommand();
+				
+				for( int i = 1; i < users.length ; ++i){
+					command.addUser(users[i]);
+				}
+				sendCommand(command);
 			}
 			else if( received.contains("has logged on")){
 				if(!received.split(" ")[0].equals(user.toString()))
