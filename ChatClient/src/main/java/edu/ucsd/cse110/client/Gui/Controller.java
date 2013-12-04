@@ -86,7 +86,7 @@ public class Controller implements CommandHandler {
 		try{
 			outgoingHandler = wireClient();
 		}catch(Exception e){
-			System.out.print("Error");
+			System.out.println("Error connecting to server");
 		}
 		ingoingHandler = GuiApplication.getInstance();
 	}

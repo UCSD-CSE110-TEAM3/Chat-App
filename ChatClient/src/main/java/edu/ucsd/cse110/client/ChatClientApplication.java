@@ -72,19 +72,18 @@ public class ChatClientApplication {
 	public static void main(String[] args) {
 		ChatClient client;
 		try {
+			System.out.println("\t\tWHISPER ME");
+			textUI UI = new textUI();
 			do {
-				System.out.println("\t\tWHISPER ME");
-				textUI UI = new textUI();
 				UI.run();
-				if(UI.registering){
-					client = wireClient(UI.username, UI.password);
+				client = wireClient(UI.username, UI.password);
+				if(UI.registering){				
 					client.register();
 					listenForRegisterStatus(client);
-					client.logon();
-					listenForLoginStatus(client);
+					UI.registering = false;
 				}
 				else{
-					client = wireClient(UI.username, UI.password);
+					System.out.println("Once");
 					client.logon();
 					listenForLoginStatus(client);
 				}
@@ -129,13 +128,14 @@ public class ChatClientApplication {
 	private static void listenForRegisterStatus(ChatClient client) {
 		long clock = 0; // Start a clock time
 		System.out.print("Registering account\n");
-		while (client.loginInProgress() == true) { // Exit loop after attempt
+		while (client.registerInProgress() == true) { // Exit loop after attempt
 													// login
 			++clock;
 			if (clock % 2 == 0) { // Print "." at every iteration
 				System.out.print(".");
 			}
 		}
+		System.out.println("");
 
 		return;
 

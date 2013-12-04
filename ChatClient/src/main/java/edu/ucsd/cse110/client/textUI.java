@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class textUI {
 	private static Scanner scanner = new Scanner(System.in);
 	private Scanner cmdScanner = new Scanner(System.in);
-	private int cmd = 0;
+	private int cmd = 2;
 	
 	protected boolean registering = false;
 
@@ -24,7 +24,7 @@ public class textUI {
 	 */
 	public void run() {
 		boolean quitcmd = false;
-		do {
+		do {			
 			promptMenu();
 			String input = cmdScanner.next();
 			cmd = getCmd(input);

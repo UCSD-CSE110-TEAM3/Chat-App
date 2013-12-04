@@ -5,11 +5,9 @@ public class Gui {
 		GuiApplication application = GuiApplication.getInstance();
 		Controller controller = Controller.getInstance();
 		controller.prepareController();
-		if(controller.ingoingHandler == null){
-			System.out.println("Error");
-		}
-		if(controller.outgoingHandler == null){
-			System.out.println("Error");
+		if(controller.ingoingHandler == null || controller.outgoingHandler == null ){
+			System.out.println("Failed to connect to server.");
+			return;
 		}
 		application.run();
 	}

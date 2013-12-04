@@ -179,15 +179,23 @@ public class ChatClient implements MessageListener{
 			msg.acknowledge(); // acknowledge to know that it is already received
 			String received = ((TextMessage)msg).getText();
 			
+			if( registerInProgress ) {
+				registerInProgress = false;
+				System.out.println( "\n" + received );
+				/*
+				if( received.equals("Your account has been registered.\nYou can now logon and whisper.") ) {
+					registerInProgress = false;
+				}*/
+				return;
+			}
 			
 			if(received.equals("!loginFailed")){
 				this.loginInProgress = false;
 				System.out.println("\n!Login Failed: Username or password is incorrect. ");
 				return;
-			}else{
+			} else{
 				this.user.setOnlineStatus(true);
-				this.loginInProgress = false;
-							
+				this.loginInProgress = false;			
 			}
 			
 			System.out.println(received);
@@ -213,6 +221,10 @@ public class ChatClient implements MessageListener{
 	
 	public boolean loginInProgress(){
 		return this.loginInProgress;
+	}
+	
+	public boolean registerInProgress() {
+		return this.registerInProgress;
 	}
 	public boolean isLogOn(){
 		return this.user.online();

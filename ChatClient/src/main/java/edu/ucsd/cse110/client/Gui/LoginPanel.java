@@ -3,6 +3,7 @@ package edu.ucsd.cse110.client.Gui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.awt.Insets;
 
 import javax.swing.*;
@@ -25,11 +26,47 @@ public class LoginPanel extends JPanel {
 	private  JPasswordField password = new JPasswordField(10);
 	private  JButton login = new JButton("Login In");
 	private  JButton register = new JButton("Register");
+	
+	private  boolean clicked;
 
 	public LoginPanel() {
 		super();
+		
 		setLayout(new GridBagLayout());
+		clicked = false;
+	    username.addMouseListener(new MouseAdapter(){
+	    	
+	        public void mouseClicked( MouseEvent e ){
+	        	if ( !clicked ) {
+	        		clicked = true;
+	        		username.setText("");
+	        	}
+	        }
+	        
+	    });
+	    
 		grid.insets = new Insets(0, 10, 5, 10);
+		grid.gridy = 0;
+		grid.gridx = 0;
+		grid.gridwidth = 2;
+		add(log, grid);
+		grid.gridwidth = 1;
+		grid.gridy = 1;
+		add(user, grid);
+		grid.gridx = 1;
+		add(username, grid);
+		grid.gridx = 0;
+		grid.gridy = 2;
+		add(pass, grid);
+		grid.gridx = 1;
+		add(password, grid);
+		grid.gridx = 0;
+		grid.gridy = 3;
+		add(register, grid);
+		grid.gridx = 1;
+		add(login, grid);
+		
+		clicked = false;
 		login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(username.getText()!=null && password.getPassword()!= null){
@@ -51,6 +88,7 @@ public class LoginPanel extends JPanel {
 			}
 		});
 		
+		username.requestFocusInWindow();
 		
 	}
 

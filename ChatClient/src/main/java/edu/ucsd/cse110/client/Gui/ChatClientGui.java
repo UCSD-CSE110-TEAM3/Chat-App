@@ -184,7 +184,7 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 						user.getPassword());
 				if (received.equals("!loginFailed")) {
 					command.setStatus(false);
-					command.setLogMessage("Username of Password is invalid");
+					command.setLogMessage("Username or Password is invalid");
 					sendCommand(command);
 				} else {
 					setUserStatus(true);

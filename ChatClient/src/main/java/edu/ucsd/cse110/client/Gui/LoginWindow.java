@@ -6,13 +6,12 @@ import java.awt.Color;
 import javax.swing.JFrame;
 
 public class LoginWindow extends JFrame {
-	LoginPanel loginPanel = new LoginPanel();;
+	LoginPanel loginPanel = new LoginPanel();
 
 
 	public LoginWindow() {
 		super("WhisperMe Login");
-
-		
+		this.requestFocus();
 		loginPanel.setBackground(Color.WHITE);
 		add(loginPanel, BorderLayout.CENTER);
 	}
