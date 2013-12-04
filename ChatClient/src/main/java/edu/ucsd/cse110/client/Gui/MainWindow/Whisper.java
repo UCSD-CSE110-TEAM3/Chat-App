@@ -6,19 +6,22 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
+import Commands.WhisperCommand;
+import edu.ucsd.cse110.client.Gui.Controller;
+
 public class Whisper extends JPanel {
 	JTextArea  chatHistory;
 	JTextField output;
 	JButton    quit; 
 	String outputStream;
 	String inputStream;
-	
+	Controller controller = Controller.getInstance();
 	
 
 	
-	public Whisper() {
+	public Whisper(String name) {
 		super(new BorderLayout());
-
+		this.setName(name);
 		quit = new JButton("End Chat");
 		quit.addActionListener(WhisperPanels.getInstance());
 		
@@ -31,15 +34,28 @@ public class Whisper extends JPanel {
 				outputStream = output.getText();
 				inputStream = outputStream;
 				output.setText("");
+				sendWhisper();
 				updateHistory();
 			}
+
+			
 		});
 		
 
 	
 		
 	}
-
+    
+	public void sendWhisper() {
+		if(outputStream != null){
+			controller.sendCommand(new WhisperCommand(this.getName(), outputStream));
+		}
+				
+	}
+	
+	public void updateHistory(String message){
+		chatHistory.append(message + "\n");
+	}
 	public void updateHistory() {
 		if (inputStream != null) {
 			chatHistory.append(inputStream + "\n");

@@ -2,9 +2,7 @@ package edu.ucsd.cse110.client.Gui.MainWindow;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.util.HashSet;
-
 import java.util.Set;
 
 import javax.swing.JTabbedPane;
@@ -30,7 +28,7 @@ public class WhisperPanels extends JTabbedPane implements ActionListener{
 	 */
 	public void newChat() {
 		/* this line below is only here for test purpose */
-		this.addTab("NewChat", new Whisper());
+		this.addTab("NewChat", new Whisper(""));
 
 	}
 
@@ -52,10 +50,27 @@ public class WhisperPanels extends JTabbedPane implements ActionListener{
 			   		
 		}
 		if(receivers.contains(e.getActionCommand()) == false){
-			addTab(e.getActionCommand(), new Whisper());
+			addTab(e.getActionCommand(), new Whisper(e.getActionCommand()));
 			receivers.add(e.getActionCommand());
-			
+			repaint();
 		}
+	}
+
+	public void printWhisper(String from, String message) {
+		int index = this.indexOfTab(from);
+		Whisper temp;
+		if(index < 0){
+			temp = new Whisper(from);
+			temp.updateHistory(message);
+			addTab(from, temp);
+			receivers.add(from);
+		}
+		else{
+		temp = (Whisper)this.getComponentAt(index);
+		temp.updateHistory(message);
+		}
+		temp.repaint();
+		this.repaint();
 	}
 	
 	

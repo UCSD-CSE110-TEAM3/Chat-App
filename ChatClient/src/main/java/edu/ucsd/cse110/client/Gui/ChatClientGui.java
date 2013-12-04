@@ -83,7 +83,7 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
-		setUserStatus(false);
+		
 		return;
 	}
     private void broadcast(BroadcastCommand command){
@@ -100,7 +100,7 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 		if(command.getReceiver() == null){
 			return;
 		}
-		
+		System.out.println(command.getReceiver() + command.getMessage());
 		Message wMsg;
 		try {
 			wMsg = msgFactory.createMessage("wMsg", command.getMessage(), command.getReceiver());
@@ -172,47 +172,52 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 
 	
 
-	public void onMessage( Message msg ) {
-		//deal with message from server
+	public void onMessage(Message msg) {
+		// deal with message from server
 		try {
-			msg.acknowledge(); // acknowledge to know that it is already received
-			String received = ((TextMessage)msg).getText();
+			msg.acknowledge(); // acknowledge to know that it is already
+								// received
+			String received = ((TextMessage) msg).getText();
 			
-			if(!user.online()){
-				LoginCommand command = new LoginCommand(user.toString(),user.getPassword());
-				if(received.equals("!loginFailed")){
+			if (!user.online()) {
+				LoginCommand command = new LoginCommand(user.toString(),
+						user.getPassword());
+				if (received.equals("!loginFailed")) {
 					command.setStatus(false);
 					command.setLogMessage("Username of Password is invalid");
 					sendCommand(command);
+				} else {
+					setUserStatus(true);
+					sendCommand(command);
 				}
-				else{
-				    setUserStatus(true);
-				    sendCommand(command);
-				}
-			}
-			else if( received.contains("Users Online:")){
+			} else if (received.contains("Users Online:")) {
 				String[] users = received.split("\n");
 				CheckUsersCommand command = new CheckUsersCommand();
-				
-				for( int i = 1; i < users.length ; ++i){
+
+				for (int i = 1; i < users.length; ++i) {
 					command.addUser(users[i]);
 				}
 				sendCommand(command);
-			}
-			else if( received.contains("has logged on")){
-				if(!received.split(" ")[0].equals(user.toString()))
-					sendCommand(new LoginCommand(received.split(" ")[0], received));
-			}else if( received.contains("has logged out")){
-				Commands command = new LoginCommand(received.split(" ")[0]);
+			} else if (received.contains("has logged on")) {
+				if (!received.split(" ")[0].equals(user.toString()))
+					sendCommand(new LoginCommand(received.split(" ")[0],
+							received));
+			} else if (received.contains("has logged out")) {
+				Commands command = new LogoutCommand(received.split(" ")[0]);
 				command.setStatus(false);
 				sendCommand(command);
-			}else if( received.contains(">whisper from ")){
-				sendCommand(new WhisperCommand(received.split(" :")[2], received.replace(">whisper from ", "")));
-			}else{
-				System.out.println(received);
+			} else if (received.contentEquals("You have been logged out of the server")) {
+				sendCommand(new LogoutCommand());
+				setUserStatus(false);
+			} else if (received.contains(">whisper from ")) {
+				String modifiedMess = received.replace(">whisper from ", "");
+				sendCommand(new WhisperCommand(modifiedMess.split(":")[0],
+						modifiedMess));
+			} else {
+
 				sendCommand(new BroadcastCommand(received));
 			}
-			
+
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

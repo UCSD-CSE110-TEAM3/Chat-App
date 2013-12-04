@@ -1,5 +1,8 @@
 package edu.ucsd.cse110.client.Gui;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import edu.ucsd.cse110.client.Gui.MainWindow.*; 
 
 import javax.swing.JFrame;
@@ -10,7 +13,7 @@ public class GuiApplication implements CommandHandler{
 	private LoginWindow loginWindow; // Login Window for User
 	private MainWindow mainWindow; // Main Window for loggedOnUser
 	public static GuiApplication instance = new GuiApplication();
-	
+	private Controller controller  = Controller.getInstance();
 	// We will import a list of Windows here for chatrooms
 
 	private GuiApplication() {
@@ -45,7 +48,11 @@ public class GuiApplication implements CommandHandler{
 		loginWindow.dispose();
 		loginWindow = null;
 		mainWindow = new MainWindow();
-		
+	    mainWindow.addWindowListener(new WindowAdapter(){
+	    	public void windowClosing(WindowEvent e ){
+	    		controller.sendCommand(new LogoutCommand());
+	    	}
+	    });
 		mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainWindow.setSize(600, 600);
 		mainWindow.setVisible(true);
@@ -72,8 +79,10 @@ public class GuiApplication implements CommandHandler{
 			loginWindow.notifyFailLogin(command.getLogMessage());
 		}
 	}
-	public void receiveWhisper(Commands command) {
-		// find a way to send to get message to window.
+	public void receiveWhisper(WhisperCommand command) {
+		if(mainWindow != null){
+			mainWindow.redirectWhisper(command.getReceiver(), command.getMessage());
+		}
 		return;
 
 	}
@@ -111,10 +120,10 @@ public class GuiApplication implements CommandHandler{
 			receiveLogon((LoginCommand)command);
 			break;
 		case Commands.LOGOUT:
-			
+			this.receiveLogout((LogoutCommand)command);
 			break;
 		case Commands.WHISPER:
-			
+			this.receiveWhisper((WhisperCommand)command);
 			break;
 		case Commands.BROADCAST:
 			this.receiveBroadcast((BroadcastCommand)command);
@@ -125,6 +134,13 @@ public class GuiApplication implements CommandHandler{
 		case Commands.CHECKUSERS:
 			this.receiveUsers((CheckUsersCommand)command);
 			break;
+		}
+		
+	}
+
+	private void receiveLogout(LogoutCommand command) {
+		if(command.getStatus()){
+			this.logOut();
 		}
 		
 	}

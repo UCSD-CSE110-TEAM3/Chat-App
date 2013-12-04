@@ -6,10 +6,10 @@ public class WhisperCommand extends Commands{
 	String message;
 	String log;
 	
-	public WhisperCommand(String from, String message){
+	public WhisperCommand(String receiver, String message){
 		super.type    = Commands.WHISPER;
 		super.status  = true;
-		this.from     = from;
+		this.receiver     = receiver;
 		this.message  = message;
 	}
 	public WhisperCommand(String from, String receiver, String message){

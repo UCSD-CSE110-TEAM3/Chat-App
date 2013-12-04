@@ -53,6 +53,11 @@ public class MainWindow extends JFrame {
 		broadcast.displayBroadcast(message);
 		
 	}
+
+	public void redirectWhisper(String from, String message) {
+		currentWhispers.printWhisper(from, message);
+		
+	}
 	
 
 }

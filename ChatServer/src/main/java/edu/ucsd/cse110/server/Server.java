@@ -190,11 +190,11 @@ public class Server{
 			String user = msg.getStringProperty("username");
 			this.logout( user );
 			Destination dest = msg.getJMSReplyTo();
-			template.convertAndSend( dest, "Logged out of server ");
+			template.convertAndSend( dest, "You have been logged out of the server");
 			this.broadcastAll( user + " has logged out" );
 			return;
 		}
-		if ( msg.getJMSType() != null && msg.getJMSType().equals("getUsersOnline") ) {
+		else if ( msg.getJMSType() != null && msg.getJMSType().equals("getUsersOnline") ) {
 			Destination dest = msg.getJMSReplyTo();
 			getUsers(dest);
 			

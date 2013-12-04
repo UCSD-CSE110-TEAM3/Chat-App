@@ -23,15 +23,16 @@ public final class MainMenu extends JMenuBar {
 
 		public AccountMenu() {
 			super("Account");
+			logOut.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					controller.sendCommand(new LogoutCommand());
+				}
+			});
 		}
 
 		public void prepareItems() {
 			add(logOut);
-			logOut.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					controller.recieveCommand(new LogoutCommand());
-				}
-			});
+			
 		}
 	}
 
