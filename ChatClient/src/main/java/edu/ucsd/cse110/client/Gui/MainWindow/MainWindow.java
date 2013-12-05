@@ -58,6 +58,12 @@ public class MainWindow extends JFrame {
 		currentWhispers.printWhisper(from, message);
 		
 	}
+
+	public void removeUser(String user) {
+		this.currentWhispers.removeUserTab(user);
+		this.usersOnline.deleteUser(user);
+		
+	}
 	
 
 }

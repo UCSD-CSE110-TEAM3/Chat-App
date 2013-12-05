@@ -141,6 +141,9 @@ public class GuiApplication implements CommandHandler{
 	private void receiveLogout(LogoutCommand command) {
 		if(command.getStatus()){
 			this.logOut();
+		}else{
+			if(mainWindow != null)
+				mainWindow.removeUser(command.getUser());
 		}
 		
 	}

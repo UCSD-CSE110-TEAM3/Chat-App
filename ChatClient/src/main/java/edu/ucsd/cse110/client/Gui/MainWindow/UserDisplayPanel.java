@@ -57,13 +57,13 @@ public class UserDisplayPanel extends JPanel{
    }
 
    public void deleteUser(String user){
-	   if(users.containsValue(user) == false)
+	   if(users.containsKey(user) == false)
 		   return;
-	   JButton tempButton = users.get(user);
+	   
+	   
+	   this.remove(users.get(user));
 	   users.remove(user);
-   
-	   this.remove(tempButton);
-	   // repaint
+	   repaint();
 	   
    }
 
