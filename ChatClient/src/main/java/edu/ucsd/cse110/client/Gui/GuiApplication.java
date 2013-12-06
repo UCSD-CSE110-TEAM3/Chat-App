@@ -72,8 +72,10 @@ public class GuiApplication implements CommandHandler{
 		if(command.getStatus()){
 			if(loginWindow != null && mainWindow == null)
 				attemptLogin();
-			else
+			else {
 			  mainWindow.addUser(command.getUsername());
+			  mainWindow.displayBroadcast( command.getUsername() + " has logged on." );
+			}
 		}else{
 		  if(loginWindow != null)
 			loginWindow.notifyFailLogin(command.getLogMessage());
@@ -145,6 +147,7 @@ public class GuiApplication implements CommandHandler{
 		}else{
 			if(mainWindow != null)
 				mainWindow.removeUser(command.getUser());
+			    mainWindow.displayBroadcast( command.getUser() + " has logged out." );
 		}
 		
 	}

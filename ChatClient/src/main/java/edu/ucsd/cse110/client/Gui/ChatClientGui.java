@@ -200,8 +200,8 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 				sendCommand(command);
 			} else if (received.contains("has logged on")) {
 				if (!received.split(" ")[0].equals(user.toString())) {
-					CheckUsersCommand command = new CheckUsersCommand();
-					command.addUser(received.split(" ")[0]);
+					LoginCommand command = new LoginCommand(received.split(" ")[0]);
+					//command.addUser(received.split(" ")[0]);
 					sendCommand(command);
 				}
 			} else if (received.contains("has logged out")) {

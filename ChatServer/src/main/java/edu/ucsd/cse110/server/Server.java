@@ -157,7 +157,7 @@ public class Server{
    	 if ( msg.getJMSType() != null && msg.getJMSType().equals("login") ) {
    		 String[] userData = ((TextMessage)msg).getText().split(":");
    		 
-   		 if(this.valid_login(userData[0], userData[1])){
+   		 if(this.valid_login(userData[0], userData[1]) && !online.containsKey(userData[0])){
    			 template.convertAndSend(msg.getJMSReplyTo(), "\nLogging In...");
    			 Destination dest = msg.getJMSReplyTo();
    			 this.login(userData[0], dest );
