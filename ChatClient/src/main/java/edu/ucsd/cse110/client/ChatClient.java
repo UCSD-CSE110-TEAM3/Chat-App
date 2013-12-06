@@ -92,7 +92,7 @@ public class ChatClient implements MessageListener{
    	 Scanner scanner = new Scanner(System.in);
    	 System.out.println("Send a broadcast message!");
    	 while(!userMsg.equals("/logout")) {
-   	     userMsg = scanner.nextLine();
+   	  userMsg = scanner.nextLine();
    		 System.out.println(userMsg); //logging
    		 if (userMsg.length() > 2 &&
    			 userMsg.substring(0, 3).equals("/w ")) {
@@ -120,29 +120,10 @@ public class ChatClient implements MessageListener{
    		 // create a chatroom "/ccr"
    		 else if( userMsg.length() >= 4 && userMsg.substring(0, 4).equals("/ccr")) {
    			 userMsg = userMsg.substring(4);
-   		   	 //scanner.close();
+   		   	 scanner.close();
    			 this.createChatroom(userMsg);
-   			 this.makingChatroom();
-   			 // pause to make chatroom
-   			 while(this.makingChatroomCheck){
-   			 }
-   	         this.startChatroomChat();
-   			 //this.inChatroom();
-   			 //while(this.inChatroomCheck){
-   			// }
-   			 System.out.println("Welcome back to BroadChat");
-   			 //scanner = new Scanner(System.in);
+   			 scanner = new Scanner(System.in);
    		 }
-   		 else if (userMsg.length() >= 6 && userMsg.substring(0, 6).equals("/join ")) {
-  			 this.tryJoinChatroom(userMsg.substring(6));
-  			 this.joiningChatroom();
-  			 while(this.joiningChatroomCheck){
-  			 }
-   	         this.startChatroomChat();
-  			 //this.inChatroom();
-  			 //while(this.inChatroomCheck){
-  			 //}
-  		 }
    		 else {
    			 this.allMsg(userMsg);
    		 }
@@ -153,22 +134,7 @@ public class ChatClient implements MessageListener{
    	 return;
     }
     
-    
-    
-    private void joiningChatroom() {
-		this.joiningChatroomCheck = true;
-	}
-
-	private void inChatroom() {
-		this.inChatroomCheck = true;
-	}
-
-	private void makingChatroom() {
-		this.makingChatroomCheck = true;
-	}
-    
-
-	// BUG: looks like message needs to be entered twice
+    // BUG: looks like message needs to be entered twice
     // start chatting in current ChatRoom
     public void startChatroomChat() {
      String userMsg = "";
@@ -177,16 +143,18 @@ public class ChatClient implements MessageListener{
      System.out.println("Send a Chatroom message!");
      while (!userMsg.equals("/leave")) {
     	 userMsg = scanRoom.nextLine();
-    	 if (userMsg.length() >= 6 && userMsg.substring(0, 6).equals("/join ")) {
-   			 this.tryJoinChatroom(userMsg.substring(6));
-   		 }
-   		 // regular chatroom message
-   		 else {
-   			 this.chatroomMsg(userMsg);
-   		 }
+    	 if (scanRoom.hasNextLine()) {
+    		 if (userMsg.length() >= 6 && userMsg.substring(0, 6).equals("/join ")) {
+   			 	this.tryJoinChatroom(userMsg.substring(6));
+   		 	}
+   		 	// regular chatroom message
+   		 	else {
+   			 	this.chatroomMsg(userMsg);
+   		 	}
+    	 }
      }
      System.out.println("leaving chatroom"); //logging
-   	 //scanRoom.close(); should never close System.in
+   	 scanRoom.close();
      this.leaveChatroom();
      return;
     }
@@ -220,14 +188,13 @@ public class ChatClient implements MessageListener{
 						joinMsg = msgFactory.createMessage("join", roomID);
 	    				producer.send(joinMsg);    			
 					} catch (JMSException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-    				//scan.close(); DONT CLOSE SHIT
+    				scan.close();
     				return;
     			}
     			else if (answer.equals("n") || answer.equals("no")) {
-    				//scan.close(); DONT CLOSE SHIT CAUSE SCANNER GAY
+    				scan.close();
     				return; // not leave nor join new chatroom
     			}
     		}
@@ -239,7 +206,6 @@ public class ChatClient implements MessageListener{
 				joinMsg = msgFactory.createMessage("join", roomID);
 				producer.send(joinMsg);    			
 			} catch (JMSException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return;
@@ -249,7 +215,7 @@ public class ChatClient implements MessageListener{
     // after attempting to join, is called by OnMessage
     public void completeJoinChatroom(String chatroomid) {
     	this.user.setChatroomID(chatroomid);
-    	this.joiningChatroomCheck = false;
+    	this.startChatroomChat();
     	return;
     }
     
@@ -259,15 +225,12 @@ public class ChatClient implements MessageListener{
     	String roomid = this.user.getChatroomID();
     	this.user.removeChatroomID();
     	Message leaveMsg;
-  		try {
-  			leaveMsg = msgFactory.createMessage("leave", roomid);
+  		 try {
+  			 leaveMsg = msgFactory.createMessage("leave", roomid);
   			 producer.send(leaveMsg);
-  		} catch (JMSException e) {
-  			 // TODO Auto-generated catch block
+  		 } catch (JMSException e) {
   			 e.printStackTrace();
-  		}
-  		// resume Broadchat
-  		this.inChatroomCheck = false;
+  		 }
     	return;
     }
     
@@ -279,7 +242,6 @@ public class ChatClient implements MessageListener{
    			 ccrMsg = msgFactory.createMessage("ccr", ccrName);
    			 producer.send(ccrMsg);
    		 } catch (JMSException e) {
-   			 // TODO Auto-generated catch block
    			 e.printStackTrace();
    		 }
    		 return;
@@ -303,7 +265,6 @@ public class ChatClient implements MessageListener{
    			 ccrMsg = msgFactory.createMessage("ccr", ccrName);
    			 producer.send(ccrMsg);
    		 } catch (JMSException e) {
-   			 // TODO Auto-generated catch block
    			 e.printStackTrace();
    		 }
    		 return;
@@ -412,8 +373,6 @@ public class ChatClient implements MessageListener{
    			 // get the room id in the message
    	   		 System.out.println(received);
    			 String roomid = received.substring(received.indexOf(":") + 2);
-   			 // made chatroom
-   			 this.makingChatroomCheck = false;
    			 this.completeJoinChatroom(roomid);
    			 return;
    		 }

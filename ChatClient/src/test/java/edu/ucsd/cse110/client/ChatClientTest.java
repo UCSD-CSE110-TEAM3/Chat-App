@@ -19,7 +19,7 @@ public class ChatClientTest {
 	
 	@Before
 	private void setUp(){
-		testClientSender = new ChatClient(null, null, "sender", "test");
+		testClientSender = new ChatClient(null, null, "this", "thatis");
 		testClientReceiver1 = new ChatClient(null, null, "receiver1", "test");
 		testClientReceiver2 = new ChatClient(null, null, "receiver2", "test");
 	}
@@ -40,5 +40,11 @@ public class ChatClientTest {
 			System.err.println("could not log in");
 		}
 	}
+	
+	@Test 
+	public void testRegister(){
+		testClientReceiver1.register();
+	}
+
 
 }
