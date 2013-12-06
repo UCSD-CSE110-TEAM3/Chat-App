@@ -23,6 +23,9 @@ public class ChatClient implements MessageListener{
     
     private boolean loginInProgress = false;
     private boolean registerInProgress = false;
+	private boolean makingChatroomCheck = false;
+	private boolean inChatroomCheck = false;
+	private boolean joiningChatroomCheck = false;
     
     public ChatClient(){};
     

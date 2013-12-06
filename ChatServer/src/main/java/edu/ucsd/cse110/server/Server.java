@@ -245,11 +245,16 @@ public class Server{
     
     // send messages to everyone of a chatroom;
     private void chatroomAll(String roomid, String message) {
+    	System.out.println("chatroomAll: " + message);
 		Chatroom theRoom = chatrooms.get(roomid);
+    	System.out.println("messaging room with members: " + theRoom.getCapacity());
+    	System.out.println("messaging room with membersnames: " + theRoom.getMembers());
     	for (String member : theRoom.getMembers()) {
      		 Destination dest = online.get(member);
+         	 System.out.println("To: " + member + " " + dest);
        		 template.convertAndSend(dest, message);
     	}
+    	return;
 	}
 
 	private void  getUsers(Destination dest) {
