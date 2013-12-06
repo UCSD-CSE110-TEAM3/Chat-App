@@ -100,8 +100,10 @@ public class GuiApplication implements CommandHandler{
 	}
 
 	public void receiveUsers(CheckUsersCommand command) {
-		if(mainWindow != null)
+		System.out.println("receive users");
+		if(mainWindow != null) {
 			mainWindow.addUser(command.getUsers());
+		}
 
 	}
 
@@ -141,6 +143,9 @@ public class GuiApplication implements CommandHandler{
 	private void receiveLogout(LogoutCommand command) {
 		if(command.getStatus()){
 			this.logOut();
+		}else{
+			if(mainWindow != null)
+				mainWindow.removeUser(command.getUser());
 		}
 		
 	}

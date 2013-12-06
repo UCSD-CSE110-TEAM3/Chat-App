@@ -22,6 +22,7 @@ public class UserDisplayPanel extends JPanel{
 	   String  tempuser;
 	   Iterator<String> iterator = usernames.iterator();
 	   add(heading);
+	   this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 	   while(iterator.hasNext()){
 		   tempuser = iterator.next();
 		   if(tempuser == null)
@@ -30,11 +31,12 @@ public class UserDisplayPanel extends JPanel{
 		   tempButton = new JButton(tempuser);
 		   tempButton.addActionListener(WhisperPanels.getInstance());
 		   users.put(tempuser, tempButton);
-		   
+		   System.out.println("Yes");
 		   this.add(tempButton);
 	   }
-	   
-	   this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	   JButton quit = new JButton("End Chat");
+	   quit.addActionListener(WhisperPanels.getInstance());
+	   this.add(quit);
    }
    
    public UserDisplayPanel(){
@@ -47,24 +49,24 @@ public class UserDisplayPanel extends JPanel{
 	   //add(heading, BorderLayout.NORTH);
 	   if(users.containsValue(user))
 		   return;
-	   
+	   System.out.println("Add user");
 	   JButton tempButton = new JButton(user);
 	   tempButton.addActionListener(WhisperPanels.getInstance());
 	   users.put( user, tempButton);
 		   
 	   this.add(tempButton);
 	   //repaint container
+	   this.repaint();
    }
 
    public void deleteUser(String user){
 	   if(users.containsValue(user) == false)
 		   return;
-	   JButton tempButton = users.get(user);
-	   users.remove(user);
-   
-	   this.remove(tempButton);
-	   // repaint
 	   
+	   
+	   this.remove(users.get(user));
+	   users.remove(user);
+	   this.repaint();
    }
 
 

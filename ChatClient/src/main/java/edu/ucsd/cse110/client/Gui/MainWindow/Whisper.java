@@ -17,13 +17,9 @@ public class Whisper extends JPanel {
 	String inputStream;
 	Controller controller = Controller.getInstance();
 	
-
-	
-	public Whisper(String name) {
+	public Whisper(String name ) {
 		super(new BorderLayout());
 		this.setName(name);
-		quit = new JButton("End Chat");
-		quit.addActionListener(WhisperPanels.getInstance());
 		
 		chatHistory = new JTextArea(30, 30);
 		chatHistory.setEditable(false);
@@ -40,9 +36,8 @@ public class Whisper extends JPanel {
 
 			
 		});
-		
-
-	
+		add(chatHistory, BorderLayout.CENTER);
+		add(output, BorderLayout.PAGE_END);
 		
 	}
     

@@ -14,5 +14,8 @@ public class LogoutCommand extends Commands{
 		this.user = user;
 	}
 	
+	public String getUser(){
+		return user;
+	}
 	
 }
