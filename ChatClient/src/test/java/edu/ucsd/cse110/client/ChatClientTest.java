@@ -13,9 +13,9 @@ import org.junit.Test;
  */
 public class ChatClientTest {
 	
-	protected ChatClient testClientSender;
-	protected ChatClient testClientReceiver1;
-	protected ChatClient testClientReceiver2;
+	private ChatClient testClientSender;
+	private ChatClient testClientReceiver1;
+	private ChatClient testClientReceiver2;
 	
 	@Before
 	private void setUp(){
