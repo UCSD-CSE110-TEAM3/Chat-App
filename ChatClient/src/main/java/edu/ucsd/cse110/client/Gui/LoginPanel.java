@@ -109,7 +109,7 @@ public class LoginPanel extends JPanel {
 	}
 
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
+		/*super.paintComponent(g);
 		grid.gridy = 0;
 		grid.gridx = 0;
 		grid.gridwidth = 2;
@@ -129,7 +129,7 @@ public class LoginPanel extends JPanel {
 		add(register, grid);
 		grid.gridx = 1;
 		add(login, grid);
-	
+	*/
 	}
 
 	public Dimension getPreferredSize() {
