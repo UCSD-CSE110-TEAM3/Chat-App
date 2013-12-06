@@ -12,12 +12,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
  
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.Destination;
  
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
@@ -206,9 +208,31 @@ public class Server{
    		 // get Destination of creator
    		 Destination dest = msg.getJMSReplyTo();
    		 String username = msg.getStringProperty("username");
-   		 this.createChatroom( dest, username,((TextMessage) msg).getText() );
+   		 this.createChatroom( dest, username, ((TextMessage) msg).getText() );
    		 return;
    	 }
+   	 // if chatroom message
+   	 else if (msg.getJMSType() != null && msg.getJMSType().equals("chatroomMsg") ) {
+   		 String chatroomMsg = ((TextMessage)msg).getText();
+   		 String roomid = msg.getStringProperty("toUser");
+   		 String username = msg.getStringProperty("username");
+   		 this.chatroomAll( roomid, username + ": "+ chatroomMsg);
+   		 return;
+   	 }
+   	 // if join chatroom
+  	 else if (msg.getJMSType() != null && msg.getJMSType().equals("join") ) {
+  		 String username = msg.getStringProperty("username");
+  		 String roomid = ((TextMessage)msg).getText();
+   		 Destination dest = msg.getJMSReplyTo();
+   		 this.joinChatroom(dest, username, roomid);
+  	 }
+   	 // if leave chatroom
+  	 else if (msg.getJMSType() != null && msg.getJMSType().equals("leave") ) {
+  		 String username = msg.getStringProperty("username");
+ 		 String roomid = ((TextMessage)msg).getText();
+  		 Destination dest = msg.getJMSReplyTo();
+  		 this.leaveChatroom(dest, username, roomid);
+  	 }
    	 try {
    		 System.out.println(((TextMessage)msg).getText());
    	 } catch (JMSException e) {
@@ -219,7 +243,16 @@ public class Server{
    	 
     }
     
-    private void  getUsers(Destination dest) {
+    // send messages to everyone of a chatroom;
+    private void chatroomAll(String roomid, String message) {
+		Chatroom theRoom = chatrooms.get(roomid);
+    	for (String member : theRoom.getMembers()) {
+     		 Destination dest = online.get(member);
+       		 template.convertAndSend(dest, message);
+    	}
+	}
+
+	private void  getUsers(Destination dest) {
    	 String users = "Users Online:";
    	 Iterator<String> iterator = online.keySet().iterator();
    	 String tempString;
@@ -228,7 +261,6 @@ public class Server{
    		 if(!online.get(tempString).equals(dest))
    			 users = users.concat("\n"+tempString);
    	 }
-   	 
    	 template.convertAndSend( dest, users );
    	 
     }
@@ -273,6 +305,7 @@ public class Server{
    	 return;
     }
     
+    // Server makes a chatroom
     public void createChatroom(Destination dest,  String username, String msg) {
    	 // make a random chatroom
    	 if (msg.equals("") ) {
@@ -288,7 +321,7 @@ public class Server{
    		 String created = "Chatroom created with Room ID: " + newRoomID;
    		 template.convertAndSend(dest, created);
    		 // put user into new room
-   		 this.joinChatRoom( dest, username, newRoomID);
+   		 this.joinChatroom( dest, username, newRoomID);
    	 }
    	 // make a room w/ specified name
    	 else {
@@ -306,16 +339,31 @@ public class Server{
    		 String created = "Chatroom created with Room ID: " + newRoomID;
    		 template.convertAndSend(dest, created);
    		 // put user into new room
-   		 this.joinChatRoom( dest, username, newRoomID);
+   		 this.joinChatroom( dest, username, newRoomID);
    	 }
     }
  
-    private void joinChatRoom(Destination dest, String username, String roomID) {
+    // see if client can join a chatroom
+    private void joinChatroom(Destination dest, String username, String roomID) {
+     System.out.println("Entering Server: joinChatroom"); // logging
    	 Chatroom toJoin = chatrooms.get(roomID);
+   	 // if room does not exist
+   	 if (toJoin == null) {
+   		 String noexist = "Chatroom you are trying to join does not exist";
+   	   	 template.convertAndSend(dest, noexist);
+   	   	 return;
+   	 }
+   	 // if chatroom is full
+   	 else if (toJoin.getCapacity() == 10) {
+   		 String full = "Chatroom you are trying to join is full";
+   	   	 template.convertAndSend(dest, full);
+   		 return;
+   	 }
    	 // add member
    	 toJoin.addMember(username);
-   	 String joined = "You joined Chatroom: " + roomID;
+   	 String joined = "!Success. You joined Chatroom: " + roomID;
    	 template.convertAndSend(dest, joined);
+     System.out.println("After sending joined message."); // logging
    	 // tell all members new member joined
    	 String newjoined = username + " has joined the Chatroom!";
    	 System.out.print("Current members in " + roomID +": " + toJoin.getCapacity()); //logging
@@ -325,7 +373,13 @@ public class Server{
    	 }
     }
     
-    
+    // delete member
+    private void leaveChatroom(Destination dest, String username, String roomID) {
+    	Chatroom leaveRoom = this.chatrooms.get(roomID);
+    	leaveRoom.removeMember(username);
+    	String leftroom = "You have left Chatroom " + roomID;
+    	template.convertAndSend(dest, leftroom); 
+    }
 }
 
 
