@@ -71,7 +71,7 @@ public class Server{
      */
     private void save_accounts(String user, String password) throws IOException {
    	  FileWriter f0 = new FileWriter("user_accounts.txt", true);
-   	  f0.write( user+":"+password);
+   	  f0.write( user+":"+password+"\n");
    	  f0.close();
    	        
     }
