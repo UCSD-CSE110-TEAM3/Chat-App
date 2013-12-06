@@ -70,6 +70,24 @@ public class LoginPanel extends JPanel {
 	        
 	    });
 	    
+	    password.addKeyListener(new KeyListener(){
+	    	
+	        public void keyTyped( KeyEvent e ){
+	        }
+
+			public void keyReleased(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void keyPressed(KeyEvent arg0) {
+				if( arg0.getKeyCode()==KeyEvent.VK_ENTER) {
+					login();
+				}
+			}
+	        
+	    });	    
+	    
 		grid.insets = new Insets(0, 10, 75, 10);
 		grid.gridy = 0;
 		grid.gridx = 0;
@@ -99,16 +117,8 @@ public class LoginPanel extends JPanel {
 		clicked = false;
 		login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String user = username.getText().trim();
-				String pass = new String(password.getPassword()).trim();
-				
-				if(user.length()>0 && pass.length() >0){
-					commandHandler.sendCommand(new LoginCommand(user, pass));
-					waitForRespond();
-				}else{
-					loginMessage("Password or Username not specified");
-				}
-				
+
+				login();
 			}
 		});
 		register.addActionListener(new ActionListener() {
@@ -163,6 +173,18 @@ public class LoginPanel extends JPanel {
 		return this.getPreferredSize();
 	}
 
+	public void login() {
+		String user = username.getText().trim();
+		String pass = new String(password.getPassword()).trim();
+		
+		if(user.length()>0 && pass.length() >0){
+			commandHandler.sendCommand(new LoginCommand(user, pass));
+			waitForRespond();
+		}else{
+			loginMessage("Password or Username not specified");
+		}
+	}
+	
 	public void waitForRespond() {
 		username.setEditable(false);
 		password.setEditable(false);
