@@ -148,7 +148,7 @@ public class Server{
    			 registerUser(userData[0], userData[1]);
    			 template.convertAndSend(msg.getJMSReplyTo(), "Your account has been registered.\nYou can now logon and whisper.");
    		 }catch(Exception e){
-   			 template.convertAndSend(msg.getJMSReplyTo(), e.getCause() );
+   			 template.convertAndSend(msg.getJMSReplyTo(), e.getMessage() );
    		 }
  
    		 return;
