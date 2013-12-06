@@ -180,16 +180,25 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 			String received = ((TextMessage) msg).getText();
 			
 			if (!user.online()) {
-				LoginCommand command = new LoginCommand(user.toString(),
-						user.getPassword());
+				
 				if (received.equals("!loginFailed")) {
+					LoginCommand command= new LoginCommand(user.toString(),
+							user.getPassword());
 					command.setStatus(false);
 					command.setLogMessage("Username or Password is invalid");
 					sendCommand(command);
-				} else {
-					setUserStatus(true);
+				} else if(received.contains("ERROR while Registering: ")){
+					RegisterCommand command = new RegisterCommand(user.toString(),
+							user.getPassword());
+					command.setStatus(false);
+					command.setLog(received);
 					sendCommand(command);
-				}
+			    }else {
+			    	LoginCommand command= new LoginCommand(user.toString(),
+							user.getPassword());
+			    	setUserStatus(true);
+					sendCommand(command);
+				} 
 			} else if (received.contains("Users Online:")) {
 				String[] users = received.split("\n");
 				CheckUsersCommand command = new CheckUsersCommand();

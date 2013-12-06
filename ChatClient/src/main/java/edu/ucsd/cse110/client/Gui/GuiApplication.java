@@ -96,8 +96,10 @@ public class GuiApplication implements CommandHandler{
 
 	}
 
-	public void recieveRegisterResponse(Commands command) {
-		// TODO Auto-generated method stub
+	public void recieveRegisterResponse(RegisterCommand command) {
+		if(command.getStatus() == false){
+			loginWindow.notifyFailLogin(command.getLog());
+		}
 
 	}
 
@@ -132,7 +134,7 @@ public class GuiApplication implements CommandHandler{
 			this.receiveBroadcast((BroadcastCommand)command);
 			break;
 		case Commands.REGISTER:
-			
+			this.recieveRegisterResponse((RegisterCommand)command);;
 			break;
 		case Commands.CHECKUSERS:
 			this.receiveUsers((CheckUsersCommand)command);
