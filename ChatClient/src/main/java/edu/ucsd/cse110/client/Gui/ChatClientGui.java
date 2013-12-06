@@ -51,7 +51,7 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 		Message registerMsg;
 		setUser(command.getUser(), command.getPassword());
 		try {
-			registerMsg = msgFactory.createMessage("register", command.getUser()+":"+command.getPassword()+"\n");
+			registerMsg = msgFactory.createMessage("register", command.getUser()+":"+command.getPassword());
 			producer.send(registerMsg);
 			
 		} catch (JMSException e) {
