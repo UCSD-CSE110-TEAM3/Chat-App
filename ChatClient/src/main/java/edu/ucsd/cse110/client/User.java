@@ -5,11 +5,13 @@ public class User {
 	private String password;
 	private boolean online;
 	private boolean register;
+	private String chatroomid;
 	
 	public User(String username, String password){
 		this.username = username;
 		this.password = password;
 		online = false;
+		chatroomid = ""; // not in a chatroom
 	}
 	
 	@Override
@@ -67,5 +69,18 @@ public class User {
 		return result;
 	}
 
+	public void setChatroomID(String chatroomid){
+		this.chatroomid = chatroomid;
+		return;
+	}
+	
+	public String getChatroomID() {
+		return this.chatroomid;
+	}
+	
+	public void removeChatroomID() {
+		this.chatroomid = "";
+		return;
+	}
 
 }
