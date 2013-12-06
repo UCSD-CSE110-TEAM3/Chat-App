@@ -185,7 +185,6 @@ public class ChatClient implements MessageListener{
 						joinMsg = msgFactory.createMessage("join", roomID);
 	    				producer.send(joinMsg);    			
 					} catch (JMSException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
     				scan.close();
@@ -204,7 +203,6 @@ public class ChatClient implements MessageListener{
 				joinMsg = msgFactory.createMessage("join", roomID);
 				producer.send(joinMsg);    			
 			} catch (JMSException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return;
@@ -228,7 +226,6 @@ public class ChatClient implements MessageListener{
   			 leaveMsg = msgFactory.createMessage("leave", roomid);
   			 producer.send(leaveMsg);
   		 } catch (JMSException e) {
-  			 // TODO Auto-generated catch block
   			 e.printStackTrace();
   		 }
     	return;
@@ -242,7 +239,6 @@ public class ChatClient implements MessageListener{
    			 ccrMsg = msgFactory.createMessage("ccr", ccrName);
    			 producer.send(ccrMsg);
    		 } catch (JMSException e) {
-   			 // TODO Auto-generated catch block
    			 e.printStackTrace();
    		 }
    		 return;
@@ -266,7 +262,6 @@ public class ChatClient implements MessageListener{
    			 ccrMsg = msgFactory.createMessage("ccr", ccrName);
    			 producer.send(ccrMsg);
    		 } catch (JMSException e) {
-   			 // TODO Auto-generated catch block
    			 e.printStackTrace();
    		 }
    		 return;
