@@ -312,7 +312,7 @@ public class ChatClient implements MessageListener{
     
     // send a message to only chatroom members
     public void chatroomMsg(String userMsg) {
-    	System.out.println("Entering chatroomMsg: " + userMsg);
+    	//System.out.println("Entering chatroomMsg: " + userMsg); //logging
     	Message chatroomMsg;
     	String roomid = this.user.getChatroomID();
     	try {

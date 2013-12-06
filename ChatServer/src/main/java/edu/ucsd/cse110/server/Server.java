@@ -245,13 +245,13 @@ public class Server{
     
     // send messages to everyone of a chatroom;
     private void chatroomAll(String roomid, String message) {
-    	System.out.println("chatroomAll: " + message);
+    	//System.out.println("chatroomAll: " + message); //logging
 		Chatroom theRoom = chatrooms.get(roomid);
-    	System.out.println("messaging room with members: " + theRoom.getCapacity());
-    	System.out.println("messaging room with membersnames: " + theRoom.getMembers());
+    	//System.out.println("messaging room with members: " + theRoom.getCapacity()); //logging
+    	//System.out.println("messaging room with membersnames: " + theRoom.getMembers()); //logging
     	for (String member : theRoom.getMembers()) {
      		 Destination dest = online.get(member);
-         	 System.out.println("To: " + member + " " + dest);
+         	 //System.out.println("To: " + member + " " + dest); //logging
        		 template.convertAndSend(dest, message);
     	}
     	return;
@@ -315,10 +315,10 @@ public class Server{
    	 // make a random chatroom
    	 if (msg.equals("") ) {
    		 Chatroom newRoom = new Chatroom();
-   		 System.out.print("Chatroom ID: " + newRoom.getRoomID()); //logging
+   		 //System.out.print("Chatroom ID: " + newRoom.getRoomID()); //logging
    		 while ( chatrooms.containsKey( newRoom.getRoomID()) ) {
    			 newRoom = new Chatroom();
-   			 System.out.print("Chatroom ID: " + newRoom.getRoomID()); //logging
+   			 //System.out.print("Chatroom ID: " + newRoom.getRoomID()); //logging
    		 }
    		 // put new room into hashmap
    		 String newRoomID = newRoom.getRoomID();
@@ -332,7 +332,7 @@ public class Server{
    	 else {
    		 Chatroom newRoom = new Chatroom(msg);
    		 String newRoomID = newRoom.getRoomID();
-   		 System.out.print("Chatroom ID: " + newRoom.getRoomID()); //logging
+   		 //System.out.print("Chatroom ID: " + newRoom.getRoomID()); //logging
    		 // if chatroom already exists
    		 if (chatrooms.containsKey(newRoomID) ) {
    			 String failCreate = "Cannot create Chatroom. Room ID already exists.";
@@ -350,7 +350,7 @@ public class Server{
  
     // see if client can join a chatroom
     private void joinChatroom(Destination dest, String username, String roomID) {
-     System.out.println("Entering Server: joinChatroom"); // logging
+     //System.out.println("Entering Server: joinChatroom"); // logging
    	 Chatroom toJoin = chatrooms.get(roomID);
    	 // if room does not exist
    	 if (toJoin == null) {
@@ -368,10 +368,10 @@ public class Server{
    	 toJoin.addMember(username);
    	 String joined = "!Success. You joined Chatroom: " + roomID;
    	 template.convertAndSend(dest, joined);
-     System.out.println("After sending joined message."); // logging
+     //System.out.println("After sending joined message."); // logging
    	 // tell all members new member joined
    	 String newjoined = username + " has joined the Chatroom!";
-   	 System.out.print("Current members in " + roomID +": " + toJoin.getCapacity()); //logging
+   	 //System.out.print("Current members in " + roomID +": " + toJoin.getCapacity()); //logging
    	 for (String member : toJoin.getMembers() ) {
    		 Destination destmember = online.get(member);
    		 template.convertAndSend(destmember, newjoined);
