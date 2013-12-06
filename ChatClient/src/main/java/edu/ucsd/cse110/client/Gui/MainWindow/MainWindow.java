@@ -5,6 +5,7 @@ import edu.ucsd.cse110.client.Gui.MainWindow.Menu.*;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.Iterator;
@@ -32,21 +33,24 @@ public class MainWindow extends JFrame {
 		broadcast.prepareComponents();
 		controller.sendCommand(new CheckUsersCommand());
 		
-		add(menu, BorderLayout.NORTH);
-		add(usersOnline, BorderLayout.LINE_START);
-		add(currentWhispers, BorderLayout.CENTER);
-		add(broadcast, BorderLayout.LINE_END);
+		Container pane = getContentPane();
+		pane.add(menu, BorderLayout.NORTH);
+		pane.add(usersOnline, BorderLayout.LINE_START);
+		pane.add(currentWhispers, BorderLayout.CENTER);
+		pane.add(broadcast, BorderLayout.LINE_END);
 		
-	}
+	} 	
 	
 	public void addUser(String username){
 		usersOnline.addUser(username);
+		
 	}
 
 	public void addUser(Set<String> users) {
 		Iterator<String> it = users.iterator();
 		while(it.hasNext())
 			usersOnline.addUser(it.next());
+		this.revalidate();
 	}
 
 	public void displayBroadcast(String message) {

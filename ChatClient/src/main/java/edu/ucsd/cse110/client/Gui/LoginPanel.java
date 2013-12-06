@@ -1,8 +1,6 @@
 package edu.ucsd.cse110.client.Gui;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.*;
 import java.awt.Insets;
 
@@ -42,8 +40,33 @@ public class LoginPanel extends JPanel {
 	        	if ( !clicked ) {
 	        		clicked = true;
 	        		username.setText("");
+	        		return;
 	        	}
+        		username.removeMouseListener(this);
 	        }
+	        
+	    });
+	    
+	    username.addKeyListener(new KeyListener(){
+	    	
+	        public void keyTyped( KeyEvent e ){
+	        	if ( !clicked ) {
+	        		clicked = true;
+	        		username.setText("");
+	        		return;
+	        	}
+        		username.removeKeyListener(this);
+	        }
+
+			public void keyReleased(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void keyPressed(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
 	        
 	    });
 	    

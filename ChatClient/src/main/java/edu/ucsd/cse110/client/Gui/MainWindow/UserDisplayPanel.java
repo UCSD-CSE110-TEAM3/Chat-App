@@ -1,6 +1,7 @@
 package edu.ucsd.cse110.client.Gui.MainWindow;
 
 import java.awt.BorderLayout;
+import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -49,14 +50,15 @@ public class UserDisplayPanel extends JPanel{
 	   //add(heading, BorderLayout.NORTH);
 	   if(users.containsValue(user))
 		   return;
-	   System.out.println("Add user");
 	   JButton tempButton = new JButton(user);
 	   tempButton.addActionListener(WhisperPanels.getInstance());
 	   users.put( user, tempButton);
 		   
 	   this.add(tempButton);
 	   //repaint container
-	   this.repaint();
+	   
+	   repaint();
+	   tempButton.repaint();
    }
 
    public void deleteUser(String user){
@@ -68,12 +70,4 @@ public class UserDisplayPanel extends JPanel{
 	   users.remove(user);
 	   repaint();
    }
-
-
-
-
-   
-   
-   
-   
 }
