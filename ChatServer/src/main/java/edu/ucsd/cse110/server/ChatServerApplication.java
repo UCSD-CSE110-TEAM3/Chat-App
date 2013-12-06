@@ -1,4 +1,3 @@
-// FIX SERVER?
 package edu.ucsd.cse110.server;
 
 import javax.jms.ConnectionFactory;
@@ -38,7 +37,6 @@ public class ChatServerApplication {
         	setMessageConverter(null);
         }};
     }
-    
     
     @Bean
     SimpleMessageListenerContainer container(final MessageListener messageListener,
