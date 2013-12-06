@@ -54,8 +54,10 @@ public class Server{
    	 BufferedReader br = new BufferedReader(f0);
    	 String line;
    	 while ((line = br.readLine()) != null) {
+   		 if(line.trim().length() > 0){
    		 List<String> pair = Arrays.asList(line.split(":"));
    		 accounts.put(pair.get(0), pair.get(1));
+   		 }
    	 }
    	 br.close();
    	 f0.close();
@@ -107,11 +109,12 @@ public class Server{
    	 
    	 try {
    		 save_accounts(user, password);
+   		 accounts.put(user, password);
    	 } catch (IOException e) {
    		 throw new RegistrationException("Server was not able to save your account.");
    	 }
     
-   	 accounts.put(user, password);
+   	 
    	 
    	 return;
  
@@ -141,7 +144,8 @@ public class Server{
     
     
     public void receive(Message msg) throws JMSException {
-   	 // if registering user
+   	 	System.out.println(((TextMessage)msg).getText());
+    	// if registering user
    	 if ( msg.getJMSType() != null && msg.getJMSType().equals("register") ) {
    		 String[] userData = ((TextMessage)msg).getText().split(":");
    		 try{

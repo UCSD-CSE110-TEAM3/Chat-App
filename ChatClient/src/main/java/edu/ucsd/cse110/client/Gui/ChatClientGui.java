@@ -51,7 +51,7 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 		Message registerMsg;
 		setUser(command.getUser(), command.getPassword());
 		try {
-			registerMsg = msgFactory.createMessage("register", command.getUser()+":"+command.getPassword()+"\n");
+			registerMsg = msgFactory.createMessage("register", command.getUser()+":"+command.getPassword());
 			producer.send(registerMsg);
 			
 		} catch (JMSException e) {
@@ -192,6 +192,10 @@ public class ChatClientGui extends ChatClient implements MessageListener, Comman
 							user.getPassword());
 					command.setStatus(false);
 					command.setLog(received);
+					sendCommand(command);
+			    } else if(received.equals("Your account has been registered.\nYou can now logon and whisper.")){
+			    	RegisterCommand command = new RegisterCommand(user.toString(),
+							user.getPassword());
 					sendCommand(command);
 			    }else {
 			    	LoginCommand command= new LoginCommand(user.toString(),

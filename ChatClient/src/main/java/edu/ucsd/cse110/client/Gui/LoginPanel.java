@@ -186,6 +186,8 @@ public class LoginPanel extends JPanel {
 	}
 	
 	public void waitForRespond() {
+		username.setText("");
+		password.setText("");
 		username.setEditable(false);
 		password.setEditable(false);
 		

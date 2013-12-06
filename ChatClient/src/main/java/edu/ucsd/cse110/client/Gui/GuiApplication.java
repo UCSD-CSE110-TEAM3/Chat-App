@@ -99,6 +99,8 @@ public class GuiApplication implements CommandHandler{
 	public void recieveRegisterResponse(RegisterCommand command) {
 		if(command.getStatus() == false){
 			loginWindow.notifyFailLogin(command.getLog());
+		}else{
+			loginWindow.notifyFailLogin("Your account is now registered");
 		}
 
 	}
