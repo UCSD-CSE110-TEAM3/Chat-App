@@ -69,21 +69,30 @@ public class LoginPanel extends JPanel {
 		clicked = false;
 		login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(username.getText()!=null && password.getPassword()!= null){
-					commandHandler.sendCommand(new LoginCommand(username
-						.getText(), new String(password.getPassword())));
+				String user = username.getText().trim();
+				String pass = new String(password.getPassword()).trim();
+				
+				if(user.length()>0 && pass.length() >0){
+					commandHandler.sendCommand(new LoginCommand(user, pass));
 					waitForRespond();
+				}else{
+					loginMessage("Password or Username not specified");
 				}
 				
 			}
 		});
 		register.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(username.getText()!=null && password.getPassword()!= null){
-					commandHandler.sendCommand(new RegisterCommand(username
-						.getText(), new String(password.getPassword())));
+				String user = username.getText().trim();
+				String pass = new String(password.getPassword()).trim();
+				
+				if(user.length()>0 && pass.length() >0){
+					commandHandler.sendCommand(new RegisterCommand(user, pass));
 					waitForRespond();
+				}else{
+					loginMessage("Password or Username not specified");
 				}
+				
 				
 			}
 		});
