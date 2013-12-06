@@ -24,9 +24,11 @@ public class LoginPanel extends JPanel {
 	private  JLabel log  = new JLabel("");
 	private  JTextField username = new JTextField("Enter Username", 10);
 	private  JPasswordField password = new JPasswordField(10);
-	private  JButton login = new JButton("Login In");
+	private  JButton login = new JButton("Login");
 	private  JButton register = new JButton("Register");
 	
+	private  ImageIcon icon = new ImageIcon("wm.png", "Whisper Me Logo");
+	private  JLabel  logo = new JLabel(icon);
 	private  boolean clicked;
 
 	public LoginPanel() {
@@ -45,23 +47,28 @@ public class LoginPanel extends JPanel {
 	        
 	    });
 	    
-		grid.insets = new Insets(0, 10, 5, 10);
+		grid.insets = new Insets(0, 10, 75, 10);
 		grid.gridy = 0;
+		grid.gridx = 0;
+		grid.gridwidth = 2;
+		add(logo,  grid);
+		grid.insets = new Insets(0, 10, 5, 10);
+		grid.gridy = 1;
 		grid.gridx = 0;
 		grid.gridwidth = 2;
 		add(log, grid);
 		grid.gridwidth = 1;
-		grid.gridy = 1;
+		grid.gridy = 2;
 		add(user, grid);
 		grid.gridx = 1;
 		add(username, grid);
 		grid.gridx = 0;
-		grid.gridy = 2;
+		grid.gridy = 3;
 		add(pass, grid);
 		grid.gridx = 1;
 		add(password, grid);
 		grid.gridx = 0;
-		grid.gridy = 3;
+		grid.gridy = 4;
 		add(register, grid);
 		grid.gridx = 1;
 		add(login, grid);
@@ -69,21 +76,30 @@ public class LoginPanel extends JPanel {
 		clicked = false;
 		login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(username.getText()!=null && password.getPassword()!= null){
-					commandHandler.sendCommand(new LoginCommand(username
-						.getText(), new String(password.getPassword())));
+				String user = username.getText().trim();
+				String pass = new String(password.getPassword()).trim();
+				
+				if(user.length()>0 && pass.length() >0){
+					commandHandler.sendCommand(new LoginCommand(user, pass));
 					waitForRespond();
+				}else{
+					loginMessage("Password or Username not specified");
 				}
 				
 			}
 		});
 		register.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(username.getText()!=null && password.getPassword()!= null){
-					commandHandler.sendCommand(new RegisterCommand(username
-						.getText(), new String(password.getPassword())));
+				String user = username.getText().trim();
+				String pass = new String(password.getPassword()).trim();
+				
+				if(user.length()>0 && pass.length() >0){
+					commandHandler.sendCommand(new RegisterCommand(user, pass));
 					waitForRespond();
+				}else{
+					loginMessage("Password or Username not specified");
 				}
+				
 				
 			}
 		});
@@ -93,7 +109,7 @@ public class LoginPanel extends JPanel {
 	}
 
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
+		/*super.paintComponent(g);
 		grid.gridy = 0;
 		grid.gridx = 0;
 		grid.gridwidth = 2;
@@ -113,7 +129,7 @@ public class LoginPanel extends JPanel {
 		add(register, grid);
 		grid.gridx = 1;
 		add(login, grid);
-	
+	*/
 	}
 
 	public Dimension getPreferredSize() {

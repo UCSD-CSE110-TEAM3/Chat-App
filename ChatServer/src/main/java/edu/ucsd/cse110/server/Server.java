@@ -1,6 +1,6 @@
 package edu.ucsd.cse110.server;
-
-
+ 
+ 
 import java.util.HashMap;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -8,145 +8,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.io.BufferedReader;
-import java.io.FileReader; 
+import java.io.FileReader;  
 import java.io.FileWriter;
 import java.io.IOException;
+ 
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.Destination;
+ 
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
-
+ 
 public class Server{
-	
-	private JmsTemplate template;
-	private HashMap<String, Destination> online;
-	private HashMap<String, String> accounts; //the accounts that is loaded to memory for now.
-	
-	
-	public Server( ) {
-		online = new HashMap<String, Destination>();
-		accounts = new HashMap<String, String>();
-		
-		try {
-			load_accounts();
-		} catch (IOException e) {
-			System.out.println("accounts not loaded");
-		}
-
-	}
-	
-	//loads account info from disk to hashmap
-	public void load_accounts() throws IOException{
-		
-		FileReader f0 = null;
-		f0 = new FileReader("user_accounts.txt");
-		
-		BufferedReader br = new BufferedReader(f0);
-		String line;
-		while ((line = br.readLine()) != null) {
-			List<String> pair = Arrays.asList(line.split(":"));
-			accounts.put(pair.get(0), pair.get(1));
-		}
-		br.close();
-		f0.close();
-			 
-
-	}
-	
-	/*
-	 * This private method writes username and password into file.
-	 * It will write even if null. 
-	 * 
-	 * Throw IOException if file could not be open
-	 */
-	private void save_accounts(String user, String password) throws IOException {
-		 FileWriter f0 = new FileWriter("user_accounts.txt", true);
-		 f0.write( user+":"+password+"\n");
-		 f0.close();
-		 	 
-	}
-
-
-	/*
-	 * This private method checks if username is in our current hashmap
-	 */
-	private boolean user_exists(String input) {
-		if (this.accounts.get(input)!=null) {
-			return true;	
-		} 	
-		return false;	
-		
-	}
-
-	/*
-	 * This private method will check if username and password are valid 
-	 * for registration. If they are it will call method to write to file.
-	 * 
-	 * Check code for reasons of failure
-	 */
-	private void registerUser(String user, String password) throws RegistrationException{
-		if(user == null || password == null){
-			throw new RegistrationException("Username or password was inValid.");
-		}
-		if(user_exists(user)){
-			throw new RegistrationException("Username already exist.");
-		}
-		if(password.length() < 6){
-			throw new RegistrationException("Password must be at least 6 characters long.");
-		}
-		
-		try {
-			save_accounts(user, password);
-		} catch (IOException e) {
-			throw new RegistrationException("Server was not able to save your account.");
-		}
-	
-		accounts.put(user, password);
-		
-		return;
-
-	}
-	
-	
-	
-	//logs in by checking if account exsists and password matches in hashmap
-	public boolean valid_login(String user, String password) {
-		
-		if ((password == null)||(user==null)) {
-			return false;
-		}
-		if (this.accounts.get(user)!=null) {
-			if (this.accounts.get(user).equals(password)) {
-				return true;
-			}
-		}
-		return false; 
-		
-	}
-	
-	public void setSender( JmsTemplate jmsTemplate ) {
-		this.template = jmsTemplate;
-		
-	}
-	
-	
-	public void receive(Message msg) throws JMSException {
-		// if registering user
-		if ( msg.getJMSType() != null && msg.getJMSType().equals("register") ) {
-			String[] userData = ((TextMessage)msg).getText().split(":");
-			try{
-				registerUser(userData[0], userData[1]);
-				template.convertAndSend(msg.getJMSReplyTo(), "Your account has been registered.\nYou can now logon and whisper.");
-			}catch(Exception e){
-				template.convertAndSend(msg.getJMSReplyTo(), e.getMessage() );
-			}
     
     private JmsTemplate template;
     private HashMap<String, Destination> online;
@@ -329,9 +208,31 @@ public class Server{
    		 // get Destination of creator
    		 Destination dest = msg.getJMSReplyTo();
    		 String username = msg.getStringProperty("username");
-   		 this.createChatroom( dest, username,((TextMessage) msg).getText() );
+   		 this.createChatroom( dest, username, ((TextMessage) msg).getText() );
    		 return;
    	 }
+   	 // if chatroom message
+   	 else if (msg.getJMSType() != null && msg.getJMSType().equals("chatroomMsg") ) {
+   		 String chatroomMsg = ((TextMessage)msg).getText();
+   		 String roomid = msg.getStringProperty("toUser");
+   		 String username = msg.getStringProperty("username");
+   		 this.chatroomAll( roomid, username + ": "+ chatroomMsg);
+   		 return;
+   	 }
+   	 // if join chatroom
+  	 else if (msg.getJMSType() != null && msg.getJMSType().equals("join") ) {
+  		 String username = msg.getStringProperty("username");
+  		 String roomid = ((TextMessage)msg).getText();
+   		 Destination dest = msg.getJMSReplyTo();
+   		 this.joinChatroom(dest, username, roomid);
+  	 }
+   	 // if leave chatroom
+  	 else if (msg.getJMSType() != null && msg.getJMSType().equals("leave") ) {
+  		 String username = msg.getStringProperty("username");
+ 		 String roomid = ((TextMessage)msg).getText();
+  		 Destination dest = msg.getJMSReplyTo();
+  		 this.leaveChatroom(dest, username, roomid);
+  	 }
    	 try {
    		 System.out.println(((TextMessage)msg).getText());
    	 } catch (JMSException e) {
@@ -342,7 +243,21 @@ public class Server{
    	 
     }
     
-    private void  getUsers(Destination dest) {
+    // send messages to everyone of a chatroom;
+    private void chatroomAll(String roomid, String message) {
+    	System.out.println("chatroomAll: " + message);
+		Chatroom theRoom = chatrooms.get(roomid);
+    	System.out.println("messaging room with members: " + theRoom.getCapacity());
+    	System.out.println("messaging room with membersnames: " + theRoom.getMembers());
+    	for (String member : theRoom.getMembers()) {
+     		 Destination dest = online.get(member);
+         	 System.out.println("To: " + member + " " + dest);
+       		 template.convertAndSend(dest, message);
+    	}
+    	return;
+	}
+
+	private void  getUsers(Destination dest) {
    	 String users = "Users Online:";
    	 Iterator<String> iterator = online.keySet().iterator();
    	 String tempString;
@@ -351,7 +266,6 @@ public class Server{
    		 if(!online.get(tempString).equals(dest))
    			 users = users.concat("\n"+tempString);
    	 }
-   	 
    	 template.convertAndSend( dest, users );
    	 
     }
@@ -396,6 +310,7 @@ public class Server{
    	 return;
     }
     
+    // Server makes a chatroom
     public void createChatroom(Destination dest,  String username, String msg) {
    	 // make a random chatroom
    	 if (msg.equals("") ) {
@@ -411,7 +326,7 @@ public class Server{
    		 String created = "Chatroom created with Room ID: " + newRoomID;
    		 template.convertAndSend(dest, created);
    		 // put user into new room
-   		 this.joinChatRoom( dest, username, newRoomID);
+   		 this.joinChatroom( dest, username, newRoomID);
    	 }
    	 // make a room w/ specified name
    	 else {
@@ -429,16 +344,31 @@ public class Server{
    		 String created = "Chatroom created with Room ID: " + newRoomID;
    		 template.convertAndSend(dest, created);
    		 // put user into new room
-   		 this.joinChatRoom( dest, username, newRoomID);
+   		 this.joinChatroom( dest, username, newRoomID);
    	 }
     }
  
-    private void joinChatRoom(Destination dest, String username, String roomID) {
+    // see if client can join a chatroom
+    private void joinChatroom(Destination dest, String username, String roomID) {
+     System.out.println("Entering Server: joinChatroom"); // logging
    	 Chatroom toJoin = chatrooms.get(roomID);
+   	 // if room does not exist
+   	 if (toJoin == null) {
+   		 String noexist = "Chatroom you are trying to join does not exist";
+   	   	 template.convertAndSend(dest, noexist);
+   	   	 return;
+   	 }
+   	 // if chatroom is full
+   	 else if (toJoin.getCapacity() == 10) {
+   		 String full = "Chatroom you are trying to join is full";
+   	   	 template.convertAndSend(dest, full);
+   		 return;
+   	 }
    	 // add member
    	 toJoin.addMember(username);
-   	 String joined = "You joined Chatroom: " + roomID;
+   	 String joined = "!Success. You joined Chatroom: " + roomID;
    	 template.convertAndSend(dest, joined);
+     System.out.println("After sending joined message."); // logging
    	 // tell all members new member joined
    	 String newjoined = username + " has joined the Chatroom!";
    	 System.out.print("Current members in " + roomID +": " + toJoin.getCapacity()); //logging
@@ -448,82 +378,13 @@ public class Server{
    	 }
     }
     
-    
+    // delete member
+    private void leaveChatroom(Destination dest, String username, String roomID) {
+    	Chatroom leaveRoom = this.chatrooms.get(roomID);
+    	leaveRoom.removeMember(username);
+    	String leftroom = "You have left Chatroom " + roomID;
+    	template.convertAndSend(dest, leftroom); 
+    }
 }
 
-			return;
-		}else
-		// if login
-		if ( msg.getJMSType() != null && msg.getJMSType().equals("login") ) {
-			String[] userData = ((TextMessage)msg).getText().split(":");
-			
-			if(this.valid_login(userData[0], userData[1])){
-				template.convertAndSend(msg.getJMSReplyTo(), "\nLogging In...");
-				Destination dest = msg.getJMSReplyTo();
-				this.login(userData[0], dest );
-				template.convertAndSend( dest, "Logged onto server ");
-				this.broadcastAll( userData[0] + " has logged on" );
-				template.convertAndSend( dest, "Enter '/help' for chat commands.");
-
-			}else{
-				template.convertAndSend(msg.getJMSReplyTo(), "!loginFailed");
-				
-			}
-			
-			return;
-		}
-		// if broadcast msg
-		else if ( msg.getJMSType() != null && msg.getJMSType().equals("all") ) {
-			String allMsg = ((TextMessage)msg).getText();
-			String username = msg.getStringProperty("username");
-			this.broadcastAll( username + ": "+ allMsg);
-			return;
-		}
-		// if whisper
-		else if ( msg.getJMSType() != null && msg.getJMSType().equals("wMsg") ) {
-			String wMsg = ((TextMessage)msg).getText();
-			String username = msg.getStringProperty("username");
-			String toUser = msg.getStringProperty("toUser");
-			Destination fromUser = msg.getJMSReplyTo();
-			this.sendOne(">whisper from " + username + ": " +wMsg, toUser, fromUser);
-			return;
-		}
-		// if logout
-		else if ( msg.getJMSType() != null && msg.getJMSType().equals("logout") ) {
-			String user = msg.getStringProperty("username");
-			this.logout( user );
-			Destination dest = msg.getJMSReplyTo();
-			//template.convertAndSend( dest, "You have been logged out of the server");
-			this.broadcastAll( user + " has logged out" );
-			return;
-		}
-		else if ( msg.getJMSType() != null && msg.getJMSType().equals("getUsersOnline") ) {
-			Destination dest = msg.getJMSReplyTo();
-			getUsers(dest);
-			
-			return;
-		}
-		try {
-			System.out.println(((TextMessage)msg).getText());
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//processMessage( msg );
-		
-	}
-	
-	private void  getUsers(Destination dest) {
-		String users = "Users Online:";
-		Iterator<String> iterator = online.keySet().iterator();
-		String tempString;
-		while(iterator.hasNext()){
-			tempString = iterator.next();
-			if(!online.get(tempString).equals(dest))
-				users = users.concat("\n"+tempString);
-		}
-		
-		template.convertAndSend( dest, users );
-		
-	}
 

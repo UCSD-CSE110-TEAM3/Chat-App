@@ -100,7 +100,6 @@ public class GuiApplication implements CommandHandler{
 	}
 
 	public void receiveUsers(CheckUsersCommand command) {
-		System.out.println("receive users");
 		if(mainWindow != null) {
 			mainWindow.addUser(command.getUsers());
 		}

@@ -9,7 +9,7 @@ public class Gui {
 			System.out.println("Failed to connect to server.");
 			return;
 		}
-		application.run();
+		application.run();	
 	}
 
 }

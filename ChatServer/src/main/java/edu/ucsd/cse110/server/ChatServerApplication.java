@@ -38,6 +38,7 @@ public class ChatServerApplication {
         }};
     }
     
+    
     @Bean
     SimpleMessageListenerContainer container(final MessageListener messageListener,
             final ConnectionFactory connectionFactory) {

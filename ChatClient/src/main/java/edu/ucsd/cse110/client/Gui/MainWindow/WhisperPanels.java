@@ -1,11 +1,17 @@
 package edu.ucsd.cse110.client.Gui.MainWindow;
 
+import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 
 public class WhisperPanels extends JTabbedPane implements ActionListener{
 	protected static WhisperPanels instance = new WhisperPanels();

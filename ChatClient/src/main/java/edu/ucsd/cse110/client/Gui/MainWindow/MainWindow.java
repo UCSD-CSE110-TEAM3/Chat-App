@@ -10,7 +10,6 @@ import java.awt.GridLayout;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -28,7 +27,7 @@ public class MainWindow extends JFrame {
 	Controller controller = Controller.getInstance();
 	public MainWindow() {
 		super("WhisperMe");
-		//currentWhispers.newChat();
+		currentWhispers.newChat();
 		menu.prepareItems();
 		broadcast.prepareComponents();
 		controller.sendCommand(new CheckUsersCommand());
@@ -37,6 +36,7 @@ public class MainWindow extends JFrame {
 		add(usersOnline, BorderLayout.LINE_START);
 		add(currentWhispers, BorderLayout.CENTER);
 		add(broadcast, BorderLayout.LINE_END);
+		
 	}
 	
 	public void addUser(String username){
